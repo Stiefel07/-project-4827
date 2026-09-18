@@ -356,9 +356,15 @@ const copyMode = document.querySelector('input[name="copyMode"]:checked')?.value
         return;
     }
 
-    const copyText = copyMode === "fillers"
+    const leaderStart = lines.findIndex(line =>
+    line.includes("Leader") ||
+    line.includes("Anführer") ||
+    line.includes("Líder")
+);
+
+const copyText = copyMode === "fillers"
     ? "👥 Fillers\n\n" + lines.slice(start + 1).join("\n")
-    : temp.innerText;
+    : lines.slice(leaderStart).join("\n");
 
     navigator.clipboard.writeText(copyText).then(() => {
         copyBtn.innerText = "Copied!";

@@ -212,11 +212,12 @@ out.innerHTML = `
 👥 <b>${t.fill}:</b><br>${fillers}
 `;
 copyBtn.style.display="block";
+document.getElementById("copyOptions").style.display="block";
 copyBtn.innerText=t.copy;
 }else{
 out.innerHTML="<b>"+t.lead+":</b><br>"+dist(main,leaderPercent);
 copyBtn.style.display="none";
-
+document.getElementById("copyOptions").style.display="none";
 }
 }
  
@@ -338,7 +339,7 @@ copyBtn.style.display = "none";
 }
 
 function copyResult(){
-
+const copyMode = document.querySelector('input[name="copyMode"]:checked')?.value || "all";
     const temp = document.createElement("div");
     temp.innerHTML = out.innerHTML;
 
@@ -355,9 +356,9 @@ function copyResult(){
         return;
     }
 
-    const copyText =
-    "👥 Fillers\n\n" +
-    lines.slice(start + 1).join("\n");
+    const copyText = copyMode === "fillers"
+    ? "👥 Fillers\n\n" + lines.slice(start + 1).join("\n")
+    : temp.innerText;
 
     navigator.clipboard.writeText(copyText).then(() => {
         copyBtn.innerText = "Copied!";

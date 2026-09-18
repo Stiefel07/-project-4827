@@ -372,14 +372,14 @@ Kingshot<br>
 
 <div id="out" class="result"></div><button id="copyBtn" onclick="copyResult()" style="display:none"></button>
 <div id="copyOptions" style="display:none;margin-top:10px;">
-<label style="font-weight:bold;">Copy to Chat</label>
+<label id="copyOptionsTitle" style="font-weight:bold;">Copy to Chat</label>
 
-<label style="font-weight:normal;margin-top:6px;">
+<label id="copyAllLabel" style="font-weight:normal;margin-top:6px;">
 <input type="radio" name="copyMode" value="all" checked>
 Leader + Fillers
 </label>
 
-<label style="font-weight:normal;margin-top:4px;">
+<label id="copyFillersLabel" style="font-weight:normal;margin-top:4px;">
 <input type="radio" name="copyMode" value="fillers">
 Fillers only
 </label>
@@ -409,6 +409,7 @@ calc:"Konter berechnen",
 rally:"🏰 Rallyeführer",solo:"⚔️ Solo (Schloss)",
 lead:"Empfohlene Haupttruppe",dist:"Anführer",fill:"Füller",counter:"Kontert",copy:"In Chat kopieren",copied:"Kopiert!",
 troopDistribution:"Empfohlene Truppenverteilung",
+copyAll:"Anführer + Füller",copyFillers:"Nur Füller",
 enemyFocus:"Gegnerfokus",
 counterLevel:"Konterstufe",
 counterAdvantage:"Kontervorteil",
@@ -467,6 +468,7 @@ calc:"Calculate Counter",
 rally:"🏰 Rally Leader",solo:"⚔️ Solo (Castle)",
 lead:"Recommended Main Troop",dist:"Leader",fill:"Fillers",counter:"Counters",copy:"Copy to Chat",copied:"Copied!",
 troopDistribution:"Recommended Troop Distribution",
+copyAll:"Leader + Fillers",copyFillers:"Fillers only",
 enemyFocus:"Enemy Focus",
 counterLevel:"Counter Level",
 counterAdvantage:"Counter Advantage",
@@ -525,6 +527,7 @@ calc:"Calcular Contraataque",
 rally:"🏰 Líder de Rally",solo:"⚔️ Solo (Castillo)",
 lead:"Tropa principal recomendada",dist:"Líder",fill:"Participantes",counter:"Contrarresta",copy:"Copiar al chat",copied:"¡Copiado!",
 troopDistribution:"Distribución recomendada de tropas",
+copyAll:"Líder + Participantes",copyFillers:"Solo participantes",
 enemyFocus:"Enfoque enemigo",
 counterLevel:"Nivel de contraataque",
 counterAdvantage:"Ventaja de contraataque",
@@ -626,6 +629,9 @@ enemyTier.add(new Option(t.plus1,"plus1"));
 enemyTier.value = "same";
 if(copyBtn.style.display!=="none"){
     copyBtn.innerText=t.copy;
+    document.getElementById("copyOptionsTitle").innerText=t.copy;
+    document.getElementById("copyAllLabel").lastChild.textContent=" "+t.copyAll;
+    document.getElementById("copyFillersLabel").lastChild.textContent=" "+t.copyFillers;
 }
 
 // Ergebnis nicht löschen

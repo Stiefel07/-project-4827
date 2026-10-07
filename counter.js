@@ -279,18 +279,18 @@ if(tie){
         (enemy === "Infantry" && sorted[1][0] === "Marksmen") ||
         (enemy === "Marksmen" && sorted[1][0] === "Infantry")
     ){
-        main = "Cavalry";
+        main = "Marksmen";
     }
 
     else if(
         (enemy === "Infantry" && sorted[1][0] === "Cavalry") ||
         (enemy === "Cavalry" && sorted[1][0] === "Infantry")
     ){
-        main = "Marksmen";
+        main = "Infantry";
     }
 
     else{
-        main = "Infantry";
+        main = "Cavalry";
     }
 }
 const tier = enemyTier.value;

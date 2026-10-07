@@ -62,15 +62,15 @@ const names={
 de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Marksmen:"Schützen"},
 en:{Infantry:"Infantry",Cavalry:"Cavalry",Marksmen:"Marksmen"},
 es:{Infantry:"Infantería",Cavalry:"Caballería",Marksmen:"Tiradores"},
-zh:{Infantry:"步兵",Cavalry:"骑兵",Marksmen:"射手"}
+
 };
 
 let l=lang.value,t=text[l];
 const tier = enemyTier.value;
 let stage="Balanced Counter";
-let filler=33;
+let filler;
 let leaderPercent = 45;
-let fillerPercent = filler;
+let fillerPercent;
 
 if(highest>=60 || gap>=35){
     stage="Heavy";
@@ -306,11 +306,7 @@ if (tier === "same") {
     percent = 39;
 }
 
-let advantage = "Balanced";
 
-if(gap >= 40){
-    advantage = "Extreme";
-}
 if(highest >= 70){
     percent = (tier === "plus1") ? 70 : 64;
 }

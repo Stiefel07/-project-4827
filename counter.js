@@ -31,6 +31,11 @@ function autoFill(changed){
 }
 function calc(){
 let i=+inf.value,c=+cav.value,a=+arc.value;
+if(i+c+a!==100){
+    out.innerHTML="<b>100% required.</b>";
+    return;
+}
+
 const allout = target.value === "allout";
 if (allout) {
     calcAllOut();

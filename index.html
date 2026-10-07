@@ -116,7 +116,7 @@ align-items:center;
 z-index:9999;
 }
 
-#supportBox{
+.supportBox{
 width:90%;
 max-width:420px;
 background:#1e293b;
@@ -127,13 +127,13 @@ box-shadow:0 10px 35px rgba(0,0,0,.45);
 border:1px solid rgba(255,255,255,.15);
 }
 
-#supportBox h3{
+.supportBox h3{
 margin-top:0;
 color:#FFD54F;
 font-size:28px;
 }
 
-#supportBox p{
+.supportBox p{
 line-height:1.6;
 margin:18px 0;
 color:#fff;
@@ -164,16 +164,16 @@ color:#fff;
 #toggleIntro:hover{
     background:#1d4ed8;
 }
-#supportBox button:last-child{
+.supportBox button:last-child{
     background:#4b5563;
 }
-#supportBox button{
+.supportBox button{
 margin-top:10px;
 }
-#supportBox button:first-child:hover{
+.supportBox button:first-child:hover{
     background:#d97706;
 }
-#supportBox button:last-child:hover{
+.supportBox button:last-child:hover{
     background:#374151;
 } 
 .result{
@@ -574,6 +574,7 @@ function setLang(){
 let l=lang.value,t=text[l];
 const currentMode = mode.value;
 const currentTarget = target.value;
+const currentEnemyTier = enemyTier.value;
 title.innerHTML = t.title;
 langLabel.innerText=t.lang;
 infLabel.innerText=t.inf;
@@ -588,19 +589,11 @@ helpContent.innerHTML = t.helpPopup;
 document.getElementById("installTitle").innerHTML = t.installTitle;
 
 document.getElementById("installText").innerHTML =
-"<b>iPhone / iPad</b><br><br>" +
-t.installStep1 + "<br><br>" +
-t.installStep2 + "<br><br>" +
-t.installStep3;
-
-document.getElementById("installOk").innerHTML = t.installOk;
-
-
-    installText.innerHTML =
         "<b>iPhone / iPad</b><br><br>" +
         t.installStep1 + "<br><br>" +
         t.installStep2 + "<br><br>" +
         t.installStep3;
+    document.getElementById("installOk").innerHTML = t.installOk;
 
 
 
@@ -626,7 +619,7 @@ target.value = currentTarget || "castle";
 enemyTier.innerHTML = "";
 enemyTier.add(new Option(t.same,"same"));
 enemyTier.add(new Option(t.plus1,"plus1"));
-enemyTier.value = "same";
+enemyTier.value = currentEnemyTier || "same";
 if(copyBtn.style.display!=="none"){
     copyBtn.innerText=t.copy;
     document.getElementById("copyOptionsTitle").innerText=t.copy;
@@ -653,9 +646,7 @@ document.addEventListener("click", function(e){
         helpPopup.style.display = "none";
     }
 });
-window.onload = function () {
-    setLang();
-};
+window.addEventListener("load", setLang);
 let guideOpen = false;
 const content = document.getElementById("guideContent");
 content.style.display = "none";
@@ -706,8 +697,8 @@ Kingshot is a trademark of its respective owner.
 </div>
 <!-- Install Popup -->
 
-<div id="installPopup" style="display:none;">
-  <div id="supportBox">
+<div id="installPopup">
+  <div class="supportBox">
 
     <h3 id="installTitle">📲 Install Battle Counter</h3>
 
@@ -727,8 +718,8 @@ OK
 
 <div id="secretSupport"></div>
 
-<div id="supportPopup" style="display:none;">
-  <div id="supportBox">
+<div id="supportPopup">
+  <div class="supportBox">
     <h3 id="supportTitle">Support the Project</h3>
 
     <p id="supportText">
@@ -767,37 +758,22 @@ window.addEventListener("beforeinstallprompt", (e) => {
 });
 
 window.addEventListener("load", () => {
-
     const btn = document.getElementById("installBtn");
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    btn.style.display = isStandalone ? "none" : "flex";
+});
 
-    if (window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone) {
-
-        btn.style.display = "none";
-
-    } else {
-
-        btn.style.display = "flex";
 document.getElementById("installBtn").onclick = async function () {
-
-    // Bereits als App geöffnet?
-    if (window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone) {
+    if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
         this.style.display = "none";
         return;
     }
-
-    // iPhone / iPad
-    const isIOS =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
     if (isIOS) {
-    document.getElementById("installPopup").style.display = "flex";
-    return;
-}
-    
-// Android / Desktop
+        document.getElementById("installPopup").style.display = "flex";
+        return;
+    }
     if (deferredPrompt) {
         deferredPrompt.prompt();
         await deferredPrompt.userChoice;
@@ -807,9 +783,7 @@ document.getElementById("installBtn").onclick = async function () {
         alert("Installation is not available on this device.");
     }
 };
-    }
 
-});
 function closeInstallPopup() {
     document.getElementById("installPopup").style.display = "none";
 }

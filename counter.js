@@ -12,6 +12,7 @@ const lang = document.getElementById("lang");
 
 const out = document.getElementById("out");
 const copyBtn = document.getElementById("copyBtn");
+
 function autoFill(changed){
     let i = parseInt(inf.value) || 0;
     let c = parseInt(cav.value) || 0;
@@ -29,44 +30,77 @@ function autoFill(changed){
         if(i + a <= 100) cav.value = 100 - i - a;
     }
 }
+
 function calc(){
+
 let i=+inf.value,c=+cav.value,a=+arc.value;
+
 if(i+c+a!==100){
     out.innerHTML="<b>100% required.</b>";
     return;
 }
 
 const allout = target.value === "allout";
-if (allout) {
-    calcAllOut();
-    return;
-}
+
 if (allout) {
     calcAllOut();
     return;
 }
 
-const vals={Infantry:i,Cavalry:c,Marksmen:a};
+if (allout) {
+    calcAllOut();
+    return;
+}
+
+const vals={
+    Infantry:i,
+    Cavalry:c,
+    Marksmen:a
+};
+
 const sorted=Object.entries(vals).sort((x,y)=>y[1]-x[1]);
+
 const enemy=sorted[0][0];
 const highest=sorted[0][1];
 const second = sorted[1][1];
 const gap = highest - second;
+
 const counter={
-"Infantry":"Marksmen",
-"Marksmen":"Cavalry",
-"Cavalry":"Infantry"
+    "Infantry":"Marksmen",
+    "Marksmen":"Cavalry",
+    "Cavalry":"Infantry"
 };
 
 const names={
-de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Marksmen:"Schützen"},
-en:{Infantry:"Infantry",Cavalry:"Cavalry",Marksmen:"Marksmen"},
-es:{Infantry:"Infantería",Cavalry:"Caballería",Marksmen:"Tiradores"},
+    de:{
+        Infantry:"Infanterie",
+        Cavalry:"Kavallerie",
+        Marksmen:"Schützen"
+    },
 
+    en:{
+        Infantry:"Infantry",
+        Cavalry:"Cavalry",
+        Marksmen:"Marksmen"
+    },
+
+    es:{
+        Infantry:"Infantería",
+        Cavalry:"Caballería",
+        Marksmen:"Tiradores"
+    },
+
+    ko:{
+        Infantry:"보병",
+        Cavalry:"기병",
+        Marksmen:"궁병"
+    }
 };
 
 let l=lang.value,t=text[l];
+
 const tier = enemyTier.value;
+
 let stage="Balanced Counter";
 let filler;
 let leaderPercent = 45;
@@ -88,16 +122,20 @@ else{
     stage="Balanced Counter";
     filler=42;
 }
+
 if(tier === "plus1"){
     if(stage === "Balanced Counter") stage = "Light";
     else if(stage === "Light") stage = "Medium";
     else if(stage === "Medium") stage = "Heavy";
 }
+
 leaderPercent = 45;
 fillerPercent = filler;
+
 if(tier === "plus1"){
     leaderPercent = 50;
 }
+
 switch(target.value){
 
 case "castle":
@@ -120,6 +158,8 @@ case "castle":
     }
 
     break;
+
+
 case "outpost":
 
     if(stage === "Balanced Counter"){
@@ -140,6 +180,7 @@ case "outpost":
     }
 
     break;
+
 
 case "shrine":
 
@@ -163,97 +204,168 @@ case "shrine":
     break;
 
 }
+
 let main=counter[enemy];
 
 if(highest === second){
+
     if(
         (enemy === "Infantry" && sorted[1][0] === "Marksmen") ||
         (enemy === "Marksmen" && sorted[1][0] === "Infantry")
     ){
         main = "Cavalry";
     }
+
     else if(
         (enemy === "Infantry" && sorted[1][0] === "Cavalry") ||
         (enemy === "Cavalry" && sorted[1][0] === "Infantry")
     ){
         main = "Marksmen";
     }
+
     else{
         main = "Infantry";
     }
 }
 
 function dist(main,p){
-let rest=100-p;
-let side=Math.floor(rest/2);
 
-let d={Infantry:side,Cavalry:side,Marksmen:side};
-d[main]=p;
-let keys=["Infantry","Cavalry","Marksmen"];
-let rem=100-(d.Infantry+d.Cavalry+d.Marksmen);
-for(let k of keys){
- if(k!=main){d[k]+=rem;break;}
-}
-return `${d.Infantry}% ${names[l].Infantry}<br>${d.Cavalry}% ${names[l].Cavalry}<br>${d.Marksmen}% ${names[l].Marksmen}`;
+    let rest=100-p;
+    let side=Math.floor(rest/2);
+
+    let d={
+        Infantry:side,
+        Cavalry:side,
+        Marksmen:side
+    };
+
+    d[main]=p;
+
+    let keys=[
+        "Infantry",
+        "Cavalry",
+        "Marksmen"
+    ];
+
+    let rem=100-(d.Infantry+d.Cavalry+d.Marksmen);
+
+    for(let k of keys){
+        if(k!=main){
+            d[k]+=rem;
+            break;
+        }
+    }
+
+    return `
+${d.Infantry}% ${names[l].Infantry}<br>
+${d.Cavalry}% ${names[l].Cavalry}<br>
+${d.Marksmen}% ${names[l].Marksmen}
+`;
 }
 
 if(mode.value==="rally"){
-let leader=dist(main,leaderPercent);
-let fillers=dist(main,fillerPercent);
-let advantage;
 
-if(stage === "Balanced Counter"){
-    advantage = t.advMinimal;
-}
-else if(stage === "Light"){
-    advantage = t.advGood;
-}
-else if(stage === "Medium"){
-    advantage = t.advStrong;
-}
-else{
-    advantage = t.advExcellent;
-}
+    let leader=dist(main,leaderPercent);
+    let fillers=dist(main,fillerPercent);
 
-if(tier === "plus1"){
-    if(advantage === t.advExcellent){
-        advantage = t.advStrong;
-    }
-    else if(advantage === t.advStrong){
-        advantage = t.advGood;
-    }
-    else if(advantage === t.advGood){
+    let advantage;
+
+    if(stage === "Balanced Counter"){
         advantage = t.advMinimal;
     }
+    else if(stage === "Light"){
+        advantage = t.advGood;
+    }
+    else if(stage === "Medium"){
+        advantage = t.advStrong;
+    }
+    else{
+        advantage = t.advExcellent;
+    }
+
+    if(tier === "plus1"){
+
+        if(advantage === t.advExcellent){
+            advantage = t.advStrong;
+        }
+        else if(advantage === t.advStrong){
+            advantage = t.advGood;
+        }
+        else if(advantage === t.advGood){
+            advantage = t.advMinimal;
+        }
+    }
+
+    out.innerHTML = `
+<b>${t.enemyFocus}:</b> ${names[l][enemy]} (${highest}%)<br>
+
+<b>${t.counterLevel}:</b> ${stage}<br>
+
+<b>${t.enemyWeakness}:</b> ${advantage}
+
+📤 <b>${t.dist}:</b><br>
+${leader}<br>
+
+👥 <b>${t.fill}:</b><br>
+${fillers}
+`;
+
+    copyBtn.style.display="block";
+
+    document
+        .getElementById("copyOptions")
+        .style.display="block";
+
+    copyBtn.innerText=t.copy;
+
+}
+else{
+
+    out.innerHTML=
+        "<b>"+t.lead+":</b><br>"+
+        dist(main,leaderPercent);
+
+    copyBtn.style.display="none";
+
+    document
+        .getElementById("copyOptions")
+        .style.display="none";
 }
 
-out.innerHTML = `
-<b>${t.enemyFocus}:</b> ${names[l][enemy]} (${highest}%)<br>
-<b>${t.counterLevel}:</b> ${stage}<br>
-<b>${t.enemyWeakness}:</b> ${advantage}
-📤 <b>${t.dist}:</b><br>${leader}<br><br>
-👥 <b>${t.fill}:</b><br>${fillers}
-`;
-copyBtn.style.display="block";
-document.getElementById("copyOptions").style.display="block";
-copyBtn.innerText=t.copy;
-}else{
-out.innerHTML="<b>"+t.lead+":</b><br>"+dist(main,leaderPercent);
-copyBtn.style.display="none";
-document.getElementById("copyOptions").style.display="none";
 }
-}
- 
+
+
 function calcAllOut(){
 
 const l = lang.value;
 const t = text[l];
 
 const names = {
-    de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Marksmen:"Schützen"},
-    en:{Infantry:"Infantry",Cavalry:"Cavalry",Marksmen:"Marksmen"},
-    es:{Infantry:"Infantería",Cavalry:"Caballería",Marksmen:"Tiradores"},
-    
+
+    de:{
+        Infantry:"Infanterie",
+        Cavalry:"Kavallerie",
+        Marksmen:"Schützen"
+    },
+
+    en:{
+        Infantry:"Infantry",
+        Cavalry:"Cavalry",
+        Marksmen:"Marksmen"
+    },
+
+    es:{
+        Infantry:"Infantería",
+        Cavalry:"Caballería",
+        Marksmen:"Tiradores"
+    },
+
+    ko:{
+        Infantry:"보병",
+        Cavalry:"기병",
+        Marksmen:"궁병"
+    }
+
 };
 
 const vals = {
@@ -262,13 +374,16 @@ const vals = {
     Marksmen:+arc.value
 };
 
-const sorted = Object.entries(vals).sort((a,b)=>b[1]-a[1]);
+const sorted =
+    Object.entries(vals)
+    .sort((a,b)=>b[1]-a[1]);
 
 const enemy = sorted[0][0];
 const highest = sorted[0][1];
 const second = sorted[1][1];
 const gap = highest - second;
 const tie = highest === second;
+
 const counter = {
     Infantry:"Marksmen",
     Marksmen:"Cavalry",
@@ -278,6 +393,7 @@ const counter = {
 let main = counter[enemy];
 
 if(tie){
+
     if(
         (enemy === "Infantry" && sorted[1][0] === "Marksmen") ||
         (enemy === "Marksmen" && sorted[1][0] === "Infantry")
@@ -296,25 +412,41 @@ if(tie){
         main = "Cavalry";
     }
 }
+
 const tier = enemyTier.value;
 
 let percent;
 
 if (tier === "same") {
     percent = 45;
-} else {
+}
+else {
     percent = 39;
 }
 
-
 if(highest >= 70){
-    percent = (tier === "plus1") ? 70 : 64;
+
+    percent =
+        (tier === "plus1")
+        ? 70
+        : 64;
+
 }
 else if(highest >= 55){
-    percent = (tier === "plus1") ? 64 : 58;
+
+    percent =
+        (tier === "plus1")
+        ? 64
+        : 58;
+
 }
 else{
-    percent = (tier === "plus1") ? 51 : 45;
+
+    percent =
+        (tier === "plus1")
+        ? 51
+        : 45;
+
 }
 
 function dist(main,p){
@@ -330,7 +462,13 @@ function dist(main,p){
 
     d[main] = p;
 
-    let rem = 100 - (d.Infantry + d.Cavalry + d.Marksmen);
+    let rem =
+        100 -
+        (
+            d.Infantry +
+            d.Cavalry +
+            d.Marksmen
+        );
 
     if(main !== "Infantry"){
         d.Infantry += rem;
@@ -343,51 +481,92 @@ function dist(main,p){
 }
 
 const d = dist(main, percent);
+
 out.innerHTML = `
 <b>⚔️ All Out Counter</b><br><br>
+
 <b>${t.enemyFocus}:</b>
-${tie ? "Mixed (" + highest + "% / " + second + "%)" : names[l][enemy] + " (" + highest + "%)"}<br><br>
+
+${tie
+    ? "Mixed (" + highest + "% / " + second + "%)"
+    : names[l][enemy] + " (" + highest + "%)"
+}
+
+<br><br>
 
 <b>${t.troopDistribution}:</b><br>
+
 ${d.Infantry}% ${names[l].Infantry}<br>
+
 ${d.Cavalry}% ${names[l].Cavalry}<br>
+
 ${d.Marksmen}% ${names[l].Marksmen}
 `;
 
 copyBtn.style.display = "none";
-    document.getElementById("copyOptions").style.display = "none";
+
+document
+    .getElementById("copyOptions")
+    .style.display = "none";
+
 }
 
-function copyResult(){
-const copyMode = document.querySelector('input[name="copyMode"]:checked')?.value || "all";
-    const lines = out.innerText.split("\n");
 
-    const start = lines.findIndex(line =>
-        line.includes("Fillers") ||
-        line.includes("Füller") ||
-        line.includes("Participantes")
-    );
+function copyResult(){
+
+    const copyMode =
+        document.querySelector(
+            'input[name="copyMode"]:checked'
+        )?.value || "all";
+
+    const lines =
+        out.innerText.split("\n");
+
+    const start =
+        lines.findIndex(line =>
+            line.includes("Fillers") ||
+            line.includes("Füller") ||
+            line.includes("Participantes")
+        );
 
     if(start < 0){
         alert("No filler troops found.");
         return;
     }
 
-    const leaderStart = lines.findIndex(line =>
-    line.includes("Leader") ||
-    line.includes("Anführer") ||
-    line.includes("Líder")
-);
+    const leaderStart =
+        lines.findIndex(line =>
+            line.includes("Leader") ||
+            line.includes("Anführer") ||
+            line.includes("Líder")
+        );
 
-const copyText = copyMode === "fillers"
-    ? "👥 Fillers\n\n" + lines.slice(start + 1).join("\n")
-    : lines.slice(leaderStart).join("\n");
+    const copyText =
+        copyMode === "fillers"
 
-    navigator.clipboard.writeText(copyText).then(() => {
-        copyBtn.innerText = "Copied!";
-        setTimeout(() => {
-            copyBtn.innerText = text[lang.value].copy;
-        },1500);
-    });
+        ? "👥 Fillers\n\n" +
+          lines
+            .slice(start + 1)
+            .join("\n")
+
+        : lines
+            .slice(leaderStart)
+            .join("\n");
+
+    navigator.clipboard
+        .writeText(copyText)
+        .then(() => {
+
+            copyBtn.innerText =
+                "Copied!";
+
+            setTimeout(() => {
+
+                copyBtn.innerText =
+                    text[lang.value].copy;
+
+            },1500);
+
+        });
 
 }

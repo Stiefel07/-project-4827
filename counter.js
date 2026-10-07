@@ -162,6 +162,24 @@ case "shrine":
 }
 let main=counter[enemy];
 
+if(highest === second){
+    if(
+        (enemy === "Infantry" && sorted[1][0] === "Marksmen") ||
+        (enemy === "Marksmen" && sorted[1][0] === "Infantry")
+    ){
+        main = "Cavalry";
+    }
+    else if(
+        (enemy === "Infantry" && sorted[1][0] === "Cavalry") ||
+        (enemy === "Cavalry" && sorted[1][0] === "Infantry")
+    ){
+        main = "Marksmen";
+    }
+    else{
+        main = "Infantry";
+    }
+}
+
 function dist(main,p){
 let rest=100-p;
 let side=Math.floor(rest/2);

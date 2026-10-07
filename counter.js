@@ -343,10 +343,7 @@ copyBtn.style.display = "none";
 
 function copyResult(){
 const copyMode = document.querySelector('input[name="copyMode"]:checked')?.value || "all";
-    const temp = document.createElement("div");
-    temp.innerHTML = out.innerHTML;
-
-    const lines = temp.innerText.split("\n");
+    const lines = out.innerText.split("\n");
 
     const start = lines.findIndex(line =>
         line.includes("Fillers") ||

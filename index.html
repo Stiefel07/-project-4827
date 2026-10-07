@@ -116,7 +116,7 @@ align-items:center;
 z-index:9999;
 }
 
-#supportBox{
+.supportBox{
 width:90%;
 max-width:420px;
 background:#1e293b;
@@ -127,13 +127,13 @@ box-shadow:0 10px 35px rgba(0,0,0,.45);
 border:1px solid rgba(255,255,255,.15);
 }
 
-#supportBox h3{
+.supportBox h3{
 margin-top:0;
 color:#FFD54F;
 font-size:28px;
 }
 
-#supportBox p{
+.supportBox p{
 line-height:1.6;
 margin:18px 0;
 color:#fff;
@@ -164,16 +164,16 @@ color:#fff;
 #toggleIntro:hover{
     background:#1d4ed8;
 }
-#supportBox button:last-child{
+.supportBox button:last-child{
     background:#4b5563;
 }
-#supportBox button{
+.supportBox button{
 margin-top:10px;
 }
-#supportBox button:first-child:hover{
+.supportBox button:first-child:hover{
     background:#d97706;
 }
-#supportBox button:last-child:hover{
+.supportBox button:last-child:hover{
     background:#374151;
 } 
 .result{
@@ -341,6 +341,7 @@ Kingshot<br>
 <option value="en">English</option>
 <option value="es">Español</option>
 <option value="de">Deutsch</option>
+<option value="ko">한국어</option>
 </select>
 
 <label id="infLabel">Infantry (%)</label>
@@ -388,7 +389,7 @@ Fillers only
 </div>
 
 <script>
-const BUILD_ID = "KSCT_2026_1.2.0_STIEFEL";
+const BUILD_ID = "KSCT_2026_1.3.0_STIEFEL";
 const BUILD_HASH = "B12X-KS-20";
 const text={
 de:{
@@ -509,6 +510,66 @@ helpPopup:`
 <button id="closeHelpBtn">Close</button>
 `,
 },
+ko:{
+title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
+lang:"언어",
+inf:"보병 (%)",cav:"기병 (%)",arc:"궁병 (%)",
+mode:"모드",
+target:"목표",
+tier:"적군 등급",
+same:"동일 등급",
+plus1:"적군 +1 등급",
+info:"먼저 적군의 병력 비율을 백분율로 입력하세요.",
+castle:"🏰 성",
+outpost:"🏕️ 전초기지",
+shrine:"🏛️ 성소 / 요새",
+allout:"⚔️ All Out (이벤트)",
+calc:"카운터 계산",
+rally:"🏰 랠리 리더",solo:"⚔️ 솔로 (성)",
+lead:"추천 주력 부대",dist:"리더",fill:"참가자",counter:"카운터",copy:"채팅에 복사",copied:"복사 완료!",
+troopDistribution:"추천 병력 배분",
+copyAll:"리더 + 참가자",copyFillers:"참가자만",
+enemyFocus:"적군 주력",
+counterLevel:"카운터 단계",
+counterAdvantage:"카운터 우위",
+stageBalanced:"균형",
+stageLight:"약함",
+stageMedium:"중간",
+stageHeavy:"강함",
+enemyWeakness:"적군의 약점",
+
+advMinimal:"⚪ 뚜렷한 약점 없음",
+advGood:"🔵 약간의 약점",
+advStrong:"🟢 뚜렷한 약점",
+advExcellent:"🟣 큰 약점",
+help:"적군 병력 비율 확인 방법",
+guideShow:"▼ 빠른 도움말 보기",
+guideHide:"▲ 빠른 도움말 닫기",
+donateTitle:"프로젝트 후원",
+donateText:"이 도구가 도움이 되었다면 자발적인 후원으로 프로젝트의 지속적인 개발을 지원할 수 있습니다.<br><br>여러분의 지원은 프로젝트를 유지하고 새로운 기능을 개발하는 데 도움이 됩니다.<br><br>진심으로 감사합니다! ❤️",
+donateBtn:"💛 후원",
+laterBtn:"✖ 나중에",
+installTitle:"📲 Battle Counter 설치",
+installStep1:"1️⃣ 공유 버튼 ⬆️ 을 누르세요",
+installStep2:"2️⃣ '홈 화면에 추가'를 선택하세요",
+installStep3:"3️⃣ '추가'를 누르세요",
+installOk:"확인",
+
+helpPopup:`
+<h2>📊 적군 병력 비율은 어디에서 확인할 수 있나요?</h2>
+
+<p>
+1. 전투 보고서를 엽니다.<br><br>
+2. <b>전체 부대</b>까지 스크롤합니다.<br><br>
+3. 작은 <b>ⓘ</b> 아이콘을 누릅니다.<br><br>
+4. 적군 병력의 비율이 표시된 창이 열립니다.<br><br>
+5. 보병, 기병, 궁병의 비율을 카운터 도구에 입력합니다.
+</p>
+
+<img src="help.png.PNG" alt="도움말" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
+<button id="closeHelpBtn">닫기</button>
+`,
+},
 es:{
 title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
 lang:"Idioma",
@@ -574,6 +635,7 @@ function setLang(){
 let l=lang.value,t=text[l];
 const currentMode = mode.value;
 const currentTarget = target.value;
+const currentEnemyTier = enemyTier.value;
 title.innerHTML = t.title;
 langLabel.innerText=t.lang;
 infLabel.innerText=t.inf;
@@ -588,19 +650,11 @@ helpContent.innerHTML = t.helpPopup;
 document.getElementById("installTitle").innerHTML = t.installTitle;
 
 document.getElementById("installText").innerHTML =
-"<b>iPhone / iPad</b><br><br>" +
-t.installStep1 + "<br><br>" +
-t.installStep2 + "<br><br>" +
-t.installStep3;
-
-document.getElementById("installOk").innerHTML = t.installOk;
-
-
-    installText.innerHTML =
         "<b>iPhone / iPad</b><br><br>" +
         t.installStep1 + "<br><br>" +
         t.installStep2 + "<br><br>" +
         t.installStep3;
+    document.getElementById("installOk").innerHTML = t.installOk;
 
 
 
@@ -626,7 +680,7 @@ target.value = currentTarget || "castle";
 enemyTier.innerHTML = "";
 enemyTier.add(new Option(t.same,"same"));
 enemyTier.add(new Option(t.plus1,"plus1"));
-enemyTier.value = "same";
+enemyTier.value = currentEnemyTier || "same";
 if(copyBtn.style.display!=="none"){
     copyBtn.innerText=t.copy;
     document.getElementById("copyOptionsTitle").innerText=t.copy;
@@ -653,9 +707,7 @@ document.addEventListener("click", function(e){
         helpPopup.style.display = "none";
     }
 });
-window.onload = function () {
-    setLang();
-};
+window.addEventListener("load", setLang);
 let guideOpen = false;
 const content = document.getElementById("guideContent");
 content.style.display = "none";
@@ -706,8 +758,8 @@ Kingshot is a trademark of its respective owner.
 </div>
 <!-- Install Popup -->
 
-<div id="installPopup" style="display:none;">
-  <div id="supportBox">
+<div id="installPopup">
+  <div class="supportBox">
 
     <h3 id="installTitle">📲 Install Battle Counter</h3>
 
@@ -727,8 +779,8 @@ OK
 
 <div id="secretSupport"></div>
 
-<div id="supportPopup" style="display:none;">
-  <div id="supportBox">
+<div id="supportPopup">
+  <div class="supportBox">
     <h3 id="supportTitle">Support the Project</h3>
 
     <p id="supportText">
@@ -767,37 +819,22 @@ window.addEventListener("beforeinstallprompt", (e) => {
 });
 
 window.addEventListener("load", () => {
-
     const btn = document.getElementById("installBtn");
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    btn.style.display = isStandalone ? "none" : "flex";
+});
 
-    if (window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone) {
-
-        btn.style.display = "none";
-
-    } else {
-
-        btn.style.display = "flex";
 document.getElementById("installBtn").onclick = async function () {
-
-    // Bereits als App geöffnet?
-    if (window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone) {
+    if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
         this.style.display = "none";
         return;
     }
-
-    // iPhone / iPad
-    const isIOS =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
     if (isIOS) {
-    document.getElementById("installPopup").style.display = "flex";
-    return;
-}
-    
-// Android / Desktop
+        document.getElementById("installPopup").style.display = "flex";
+        return;
+    }
     if (deferredPrompt) {
         deferredPrompt.prompt();
         await deferredPrompt.userChoice;
@@ -807,9 +844,7 @@ document.getElementById("installBtn").onclick = async function () {
         alert("Installation is not available on this device.");
     }
 };
-    }
 
-});
 function closeInstallPopup() {
     document.getElementById("installPopup").style.display = "none";
 }

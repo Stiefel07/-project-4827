@@ -32,12 +32,14 @@ function autoFill(changed){
 function calc(){
 let i=+inf.value,c=+cav.value,a=+arc.value;
 const allout = target.value === "allout";
-if (allout) {
-    calcAllOut();
-    return;
-}
 if(i+c+a!==100){
     out.innerHTML="<b>100% required.</b>";
+    copyBtn.style.display="none";
+    document.getElementById("copyOptions").style.display="none";
+    return;
+}
+if (allout) {
+    calcAllOut();
     return;
 }
 
@@ -336,6 +338,7 @@ ${d.Marksmen}% ${names[l].Marksmen}
 `;
 
 copyBtn.style.display = "none";
+    document.getElementById("copyOptions").style.display = "none";
 }
 
 function copyResult(){

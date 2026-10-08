@@ -428,7 +428,7 @@ const BUILD_ID = "KSCT_2026_1.3.0_STIEFEL";
 const BUILD_HASH = "B12X-KS-20";
 const text={
 de:{
-title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
+title:`⚔️ Kampf<br><span class="subtitle">Konter ⚔️</span>`,
 lang:"Sprache",
 inf:"Infanterie (%)",cav:"Kavallerie (%)",arc:"Bogenschützen (%)",
 mode:"Modus",
@@ -548,7 +548,7 @@ helpPopup:`
 `,
 },
 es:{
-title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
+title:`⚔️ Batalla<br><span class="subtitle">Contraataque ⚔️</span>`,
 lang:"Idioma",
 inf:"Infantería (%)",cav:"Caballería (%)",arc:"Arqueros (%)",
 mode:"Modo",
@@ -608,7 +608,7 @@ helpPopup:`
 `,
 },
 ko:{
-title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
+title:`⚔️ 전투<br><span class="subtitle">카운터 ⚔️</span>`,
 lang:"언어",
 inf:"보병 (%)",cav:"기병 (%)",arc:"궁수 (%)",
 mode:"모드",
@@ -694,7 +694,7 @@ helpPopup:`
 `,
 },
 fil:{
-title:`⚔️ Battle Counter`,
+title:`⚔️ Kontra ng Labanan`,
 lang:"Wika",inf:"Impanterya (%)",cav:"Kabalyerya (%)",arc:"Mamamana (%)",
 mode:"Mode",target:"Target",tier:"Antas ng Kalaban",same:"Parehong antas",plus1:"Kalaban +1 antas",
 info:"Ilagay muna ang porsiyento ng mga tropa ng kalaban.",percentRequired:"Dapat umabot sa 100% ang kabuuang porsiyento ng mga tropa.",
@@ -852,6 +852,9 @@ if(document.getElementById("supportTitle")){
 }
 guideHeader.innerText = guideOpen ? t.guideHide : t.guideShow;
 calcBtn.innerText=t.calc;
+document.getElementById("copyOptionsTitle").innerText=t.copy;
+document.getElementById("copyAllLabel").lastChild.textContent=" "+t.copyAll;
+document.getElementById("copyFillersLabel").lastChild.textContent=" "+t.copyFillers;
 
 mode.innerHTML="";
 mode.add(new Option(t.rally,"rally"));
@@ -869,9 +872,6 @@ enemyTier.add(new Option(t.plus1,"plus1"));
 enemyTier.value = currentEnemyTier || "same";
 if(copyBtn.style.display!=="none"){
     copyBtn.innerText=t.copy;
-    document.getElementById("copyOptionsTitle").innerText=t.copy;
-    document.getElementById("copyAllLabel").lastChild.textContent=" "+t.copyAll;
-    document.getElementById("copyFillersLabel").lastChild.textContent=" "+t.copyFillers;
 }
 
 // Ergebnis nicht löschen

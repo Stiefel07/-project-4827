@@ -84,8 +84,8 @@ cursor:pointer;
 }
 button:hover{background:#d97706}
 #quickPresets{margin-top:12px}
-#quickPresetButtons{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
-#quickPresetButtons button{flex:1 1 calc(50% - 8px);min-height:50px;width:auto;margin:0;padding:12px 8px;font-size:16px;background:#334155;border:1px solid rgba(255,255,255,.2)}
+#quickPresetButtons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}
+#quickPresetButtons button{min-height:40px;width:100%;margin:0;padding:8px 4px;font-size:14px;background:#334155;border:1px solid rgba(255,255,255,.2)}
 #quickPresetButtons button:hover{background:#475569}
 #secretSupport{
     position:fixed;
@@ -364,11 +364,11 @@ Kingshot<br>
 <label id="cavLabel">Cavalry (%)</label>
 <input id="cav" type="number" min="0" max="100" step="1" value="20" oninput="autoFill('cav')">
 
-<label id="arcLabel">Marksmen (%)</label>
+<label id="arcLabel">Archers (%)</label>
 <input id="arc" type="number" min="0" max="100" step="1" value="40" oninput="autoFill('arc')">
 
 <div id="quickPresets">
-<label id="quickPresetsLabel">Quick sets (Infantry / Cavalry / Marksmen)</label>
+<label id="quickPresetsLabel">Quick sets (Infantry / Cavalry / Archers)</label>
 <div id="quickPresetButtons">
 <button type="button" data-troops="50,20,30">50 / 20 / 30</button>
 <button type="button" data-troops="60,40,0">60 / 40 / 0</button>
@@ -424,7 +424,7 @@ const text={
 de:{
 title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
 lang:"Sprache",
-inf:"Infanterie (%)",cav:"Kavallerie (%)",arc:"Schützen (%)",
+inf:"Infanterie (%)",cav:"Kavallerie (%)",arc:"Bogenschützen (%)",
 mode:"Modus",
 target:"Ziel",
 tier:"Gegnerstufe",
@@ -461,7 +461,7 @@ donateText:"Wenn dir dieses Tool geholfen hat, kannst du die Weiterentwicklung m
 donateBtn:"💛 Spenden",
 laterBtn:"✖ Jetzt nicht",
 installTitle:"📲 Battle Counter installieren",
-quickPresets:"Schnellauswahl (Infanterie / Kavallerie / Schützen)",
+quickPresets:"Schnellauswahl (Infanterie / Kavallerie / Bogenschützen)",
 installStep1:"1️⃣ Tippe auf den Share-Button ⬆️",
 installStep2:"2️⃣ Wähle 'Zum Home-Bildschirm'",
 installStep3:"3️⃣ Tippe auf 'Hinzufügen'",
@@ -475,7 +475,7 @@ helpPopup:`
 2. Scrolle bis <b>„Schwadron insgesamt“</b>.<br><br>
 3. Tippe auf das kleine <b>ⓘ</b>-Symbol.<br><br>
 4. Es öffnet sich ein Fenster mit den Prozentwerten der gegnerischen Truppen.<br><br>
-5. Übertrage die Prozentwerte für Infanterie, Kavallerie und Schützen in den Konterrechner.
+5. Übertrage die Prozentwerte für Infanterie, Kavallerie und Bogenschützen in den Konterrechner.
 </p>
 <img src="help.png.PNG" alt="Hilfe" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
 <button id="closeHelpBtn">Schließen</button>
@@ -484,7 +484,7 @@ helpPopup:`
 en:{
 title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
 lang:"Language",
-inf:"Infantry (%)",cav:"Cavalry (%)",arc:"Marksmen (%)",
+inf:"Infantry (%)",cav:"Cavalry (%)",arc:"Archers (%)",
 mode:"Mode",
 target:"Target",
 tier:"Enemy Tier",
@@ -521,7 +521,7 @@ donateText:"If this tool has been helpful to you, you can support future updates
 donateBtn:"💛 Donate",
 laterBtn:"✖ Not now",
 installTitle:"📲 Install Battle Counter",
-quickPresets:"Quick sets (Infantry / Cavalry / Marksmen)",
+quickPresets:"Quick sets (Infantry / Cavalry / Archers)",
 installStep1:"1️⃣ Tap the Share button ⬆️",
 installStep2:"2️⃣ Choose 'Add to Home Screen'",
 installStep3:"3️⃣ Tap 'Add'",
@@ -535,7 +535,7 @@ helpPopup:`
 2. Scroll down to <b>Squad Total</b>.<br><br>
 3. Tap the small <b>ⓘ</b> icon.<br><br>
 4. A window will open showing the enemy troop percentages.<br><br>
-5. Enter the Infantry, Cavalry and Marksmen percentages into the Counter Tool.
+5. Enter the Infantry, Cavalry and Archers percentages into the Counter Tool.
 </p>
 <img src="help.png.PNG" alt="Help" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
 <button id="closeHelpBtn">Close</button>
@@ -544,7 +544,7 @@ helpPopup:`
 es:{
 title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
 lang:"Idioma",
-inf:"Infantería (%)",cav:"Caballería (%)",arc:"Tiradores (%)",
+inf:"Infantería (%)",cav:"Caballería (%)",arc:"Arqueros (%)",
 mode:"Modo",
 target:"Objetivo",
 tier:"Nivel enemigo",
@@ -581,7 +581,7 @@ donateText:"Si esta herramienta te ha sido útil, puedes apoyar futuras actualiz
 donateBtn:"💛 Donar",
 laterBtn:"✖ Ahora no",
 installTitle:"📲 Instalar Battle Counter",
-quickPresets:"Selección rápida (Infantería / Caballería / Tiradores)",
+quickPresets:"Selección rápida (Infantería / Caballería / Arqueros)",
 installStep1:"1️⃣ Pulsa el botón Share ⬆️",
 installStep2:"2️⃣ Selecciona 'Añadir a pantalla de inicio'",
 installStep3:"3️⃣ Pulsa 'Añadir'",
@@ -595,7 +595,7 @@ helpPopup:`
 2. Desplázate hasta <b>«Escuadrón total»</b>.<br><br>
 3. Pulsa el pequeño icono <b>ⓘ</b>.<br><br>
 4. Se abrirá una ventana con los porcentajes de las tropas enemigas.<br><br>
-5. Introduce los porcentajes de Infantería, Caballería y Tiradores en la Calculadora de Contraataque.
+5. Introduce los porcentajes de Infantería, Caballería y Arqueros en la Calculadora de Contraataque.
 </p>
 <img src="help.png.PNG" alt="Ayuda" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
 <button id="closeHelpBtn">Cerrar</button>
@@ -604,7 +604,7 @@ helpPopup:`
 ko:{
 title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
 lang:"언어",
-inf:"보병 (%)",cav:"기병 (%)",arc:"궁병 (%)",
+inf:"보병 (%)",cav:"기병 (%)",arc:"궁수 (%)",
 mode:"모드",
 target:"목표",
 tier:"적군 등급",
@@ -641,7 +641,7 @@ donateText:"이 도구가 도움이 되었다면 자발적인 후원으로 프�
 donateBtn:"후원",
 laterBtn:"나중에",
 installTitle:"📲 Battle Counter 설치",
-quickPresets:"빠른 선택 (보병 / 기병 / 궁병)",
+quickPresets:"빠른 선택 (보병 / 기병 / 궁수)",
 installStep1:"1️⃣ 공유 버튼 ⬆️ 을 누르세요",
 installStep2:"2️⃣ '홈 화면에 추가'를 선택하세요",
 installStep3:"3️⃣ '추가'를 누르세요",
@@ -655,7 +655,7 @@ helpPopup:`
 2. <b>전체 부대</b>까지 스크롤합니다.<br><br>
 3. 작은 <b>ⓘ</b> 아이콘을 누릅니다.<br><br>
 4. 적군 병력의 비율이 표시된 창이 열립니다.<br><br>
-5. 보병, 기병, 궁병의 비율을 카운터 도구에 입력합니다.
+5. 보병, 기병, 궁수의 비율을 카운터 도구에 입력합니다.
 </p>
 
 <img src="help.png.PNG" alt="도움말" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">

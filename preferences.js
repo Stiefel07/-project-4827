@@ -61,10 +61,10 @@
 
         document.querySelectorAll("#quickPresetButtons [data-troops]").forEach((button) => {
             button.addEventListener("click", () => {
-                const [infantry, cavalry, marksmen] = button.dataset.troops.split(",");
+                const [infantry, cavalry, archers] = button.dataset.troops.split(",");
                 document.getElementById("inf").value = infantry;
                 document.getElementById("cav").value = cavalry;
-                document.getElementById("arc").value = marksmen;
+                document.getElementById("arc").value = archers;
                 savePreferences();
                 window.dispatchEvent(new Event("preferences-restored"));
             });

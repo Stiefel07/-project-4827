@@ -68,7 +68,7 @@ if (allout) {
     return;
 }
 
-const vals={Infantry:i,Cavalry:c,Marksmen:a};
+const vals={Infantry:i,Cavalry:c,Archers:a};
 const sorted=Object.entries(vals).sort((x,y)=>y[1]-x[1]);
 const enemy=sorted[0][0];
 const highest=sorted[0][1];
@@ -77,16 +77,16 @@ const gap = highest - second;
 const twoTypeTie = highest === second && sorted[2][1] === 0;
 
 const counter={
-"Infantry":"Marksmen",
-"Marksmen":"Cavalry",
+"Infantry":"Archers",
+"Archers":"Cavalry",
 "Cavalry":"Infantry"
 };
 
 const names={
-de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Marksmen:"Schützen"},
-en:{Infantry:"Infantry",Cavalry:"Cavalry",Marksmen:"Marksmen"},
-es:{Infantry:"Infantería",Cavalry:"Caballería",Marksmen:"Tiradores"},
-ko:{Infantry:"보병",Cavalry:"기병",Marksmen:"궁병"}
+de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Archers:"Bogenschützen"},
+en:{Infantry:"Infantry",Cavalry:"Cavalry",Archers:"Archers"},
+es:{Infantry:"Infantería",Cavalry:"Caballería",Archers:"Arqueros"},
+ko:{Infantry:"보병",Cavalry:"기병",Archers:"궁수"}
 };
 
 let l=lang.value,t=text[l];
@@ -198,8 +198,8 @@ let main=counter[enemy];
 
 if(highest === second){
     if(
-        (enemy === "Infantry" && sorted[1][0] === "Marksmen") ||
-        (enemy === "Marksmen" && sorted[1][0] === "Infantry")
+        (enemy === "Infantry" && sorted[1][0] === "Archers") ||
+        (enemy === "Archers" && sorted[1][0] === "Infantry")
     ){
         main = "Cavalry";
     }
@@ -207,7 +207,7 @@ if(highest === second){
         (enemy === "Infantry" && sorted[1][0] === "Cavalry") ||
         (enemy === "Cavalry" && sorted[1][0] === "Infantry")
     ){
-        main = "Marksmen";
+        main = "Archers";
     }
     else{
         main = "Infantry";
@@ -218,13 +218,13 @@ function dist(main,p){
 let rest=100-p;
 let side=Math.floor(rest/2);
 
-let d={Infantry:side,Cavalry:side,Marksmen:side};
+let d={Infantry:side,Cavalry:side,Archers:side};
 
 d[main]=p;
 
-let keys=["Infantry","Cavalry","Marksmen"];
+let keys=["Infantry","Cavalry","Archers"];
 
-let rem=100-(d.Infantry+d.Cavalry+d.Marksmen);
+let rem=100-(d.Infantry+d.Cavalry+d.Archers);
 
 for(let k of keys){
  if(k!=main){
@@ -233,7 +233,7 @@ for(let k of keys){
  }
 }
 
-return `${d.Infantry}% ${names[l].Infantry}<br>${d.Cavalry}% ${names[l].Cavalry}<br>${d.Marksmen}% ${names[l].Marksmen}`;
+return `${d.Infantry}% ${names[l].Infantry}<br>${d.Cavalry}% ${names[l].Cavalry}<br>${d.Archers}% ${names[l].Archers}`;
 }
 
 const enemyFocusLabel = twoTypeTie ? t.enemyComposition : t.enemyFocus;
@@ -306,16 +306,16 @@ const l = lang.value;
 const t = text[l];
 
 const names = {
-    de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Marksmen:"Schützen"},
-    en:{Infantry:"Infantry",Cavalry:"Cavalry",Marksmen:"Marksmen"},
-    es:{Infantry:"Infantería",Cavalry:"Caballería",Marksmen:"Tiradores"},
-    ko:{Infantry:"보병",Cavalry:"기병",Marksmen:"궁병"}
+    de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Archers:"Bogenschützen"},
+    en:{Infantry:"Infantry",Cavalry:"Cavalry",Archers:"Archers"},
+    es:{Infantry:"Infantería",Cavalry:"Caballería",Archers:"Arqueros"},
+    ko:{Infantry:"보병",Cavalry:"기병",Archers:"궁수"}
 };
 
 const vals = {
     Infantry:+inf.value,
     Cavalry:+cav.value,
-    Marksmen:+arc.value
+    Archers:+arc.value
 };
 
 const sorted = Object.entries(vals).sort((a,b)=>b[1]-a[1]);
@@ -327,8 +327,8 @@ const gap = highest - second;
 const tie = highest === second;
 
 const counter = {
-    Infantry:"Marksmen",
-    Marksmen:"Cavalry",
+    Infantry:"Archers",
+    Archers:"Cavalry",
     Cavalry:"Infantry"
 };
 
@@ -337,10 +337,10 @@ let main = counter[enemy];
 if(tie){
 
     if(
-        (enemy === "Infantry" && sorted[1][0] === "Marksmen") ||
-        (enemy === "Marksmen" && sorted[1][0] === "Infantry")
+        (enemy === "Infantry" && sorted[1][0] === "Archers") ||
+        (enemy === "Archers" && sorted[1][0] === "Infantry")
     ){
-        main = "Marksmen";
+        main = "Archers";
     }
 
     else if(
@@ -383,12 +383,12 @@ function dist(main,p){
     let d = {
         Infantry:side,
         Cavalry:side,
-        Marksmen:side
+        Archers:side
     };
 
     d[main] = p;
 
-    let rem = 100 - (d.Infantry + d.Cavalry + d.Marksmen);
+    let rem = 100 - (d.Infantry + d.Cavalry + d.Archers);
 
     if(main !== "Infantry"){
         d.Infantry += rem;
@@ -410,7 +410,7 @@ ${tie ? "Mixed (" + highest + "% / " + second + "%)" : names[l][enemy] + " (" + 
 <b>${t.troopDistribution}:</b><br>
 ${d.Infantry}% ${names[l].Infantry}<br>
 ${d.Cavalry}% ${names[l].Cavalry}<br>
-${d.Marksmen}% ${names[l].Marksmen}
+${d.Archers}% ${names[l].Archers}
 `;
 
 copyBtn.style.display = "none";

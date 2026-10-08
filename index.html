@@ -83,6 +83,10 @@ border-radius:12px;
 cursor:pointer;
 }
 button:hover{background:#d97706}
+#quickPresets{margin-top:12px}
+#quickPresetButtons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}
+#quickPresetButtons button{min-height:40px;width:100%;margin:0;padding:8px 4px;font-size:14px;background:#334155;border:1px solid rgba(255,255,255,.2)}
+#quickPresetButtons button:hover{background:#475569}
 #secretSupport{
     position:fixed;
     right:14px;
@@ -352,16 +356,34 @@ Kingshot<br>
 <option value="es">Español</option>
 <option value="de">Deutsch</option>
 <option value="ko">한국어</option>
+<option value="zh">简体中文</option>
+<option value="fil">Filipino</option>
+<option value="th">ไทย</option>
+<option value="tr">Türkçe</option>
+<option value="ru">Русский</option>
+<option value="vi">Tiếng Việt</option>
 </select>
 
 <label id="infLabel">Infantry (%)</label>
-<input id="inf" type="number" value="40" oninput="autoFill('inf')">
+<input id="inf" type="number" min="0" max="100" step="1" value="40" oninput="autoFill('inf')">
 
 <label id="cavLabel">Cavalry (%)</label>
-<input id="cav" type="number" value="20" oninput="autoFill('cav')">
+<input id="cav" type="number" min="0" max="100" step="1" value="20" oninput="autoFill('cav')">
 
-<label id="arcLabel">Marksmen (%)</label>
-<input id="arc" type="number" value="40" oninput="autoFill('arc')">
+<label id="arcLabel">Archers (%)</label>
+<input id="arc" type="number" min="0" max="100" step="1" value="40" oninput="autoFill('arc')">
+
+<div id="quickPresets">
+<label id="quickPresetsLabel">Quick sets (Infantry / Cavalry / Archers)</label>
+<div id="quickPresetButtons">
+<button type="button" data-troops="50,20,30">50 / 20 / 30</button>
+<button type="button" data-troops="60,40,0">60 / 40 / 0</button>
+<button type="button" data-troops="50,0,50">50 / 0 / 50</button>
+<button type="button" data-troops="0,50,50">0 / 50 / 50</button>
+<button type="button" data-troops="50,50,0">50 / 50 / 0</button>
+<button type="button" data-troops="33,33,34" title="Balanced mixed troops">33 / 33 / 34</button>
+</div>
+</div>
 
 <label id="modeLabel">Mode</label>
 <select id="mode"></select>
@@ -382,6 +404,10 @@ Kingshot<br>
 <button id="calcBtn" onclick="calc()"></button>
 
 <div id="out" class="result"></div><button id="copyBtn" onclick="copyResult()" style="display:none"></button>
+<section id="mixedAdvice" class="result" style="display:none;">
+<b id="mixedAdviceTitle"></b><br>
+<span id="mixedAdviceText"></span>
+</section>
 <div id="copyOptions" style="display:none;margin-top:10px;">
 <label id="copyOptionsTitle" style="font-weight:bold;">Copy to Chat</label>
 
@@ -399,29 +425,30 @@ Fillers only
 </div>
 
 <script>
-const BUILD_ID = "KSCT_2026_1.3.0_STIEFEL";
+const APP_VERSION = "1.4.0";
+const BUILD_ID = `KSCT_2026_${APP_VERSION}_STIEFEL`;
 const BUILD_HASH = "B12X-KS-20";
 const text={
 de:{
-title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
+title:`⚔️ Kampf<br><span class="subtitle">Konter ⚔️</span>`,
 lang:"Sprache",
-inf:"Infanterie (%)",cav:"Kavallerie (%)",arc:"Schützen (%)",
+inf:"Infanterie (%)",cav:"Kavallerie (%)",arc:"Bogenschützen (%)",
 mode:"Modus",
 target:"Ziel",
 tier:"Gegnerstufe",
 same:"Gleiche Stufe",
 plus1:"Gegner +1 Stufe",
-info:"Gib zuerst die Truppenverteilung des Gegners in Prozent ein.",
+info:"Gib zuerst die Truppenverteilung des Gegners in Prozent ein.",percentRequired:"Die Truppenwerte müssen zusammen 100 % ergeben.",
 castle:"🏰 Burg",
 outpost:"🏕️ Außenposten",
 shrine:"🏛️ Heiligtum / Festung",
 allout:"⚔️ All Out (Event)",
 calc:"Konter berechnen",
 rally:"🏰 Rallyeführer",solo:"⚔️ Solo (Schloss)",
-lead:"Empfohlene Haupttruppe",dist:"Anführer",fill:"Füller",counter:"Kontert",copy:"In Chat kopieren",copied:"Kopiert!",
+lead:"Empfohlene Haupttruppe",dist:"Anführer",fill:"Füller",counter:"Kontert",copy:"In Chat kopieren",copied:"Kopiert!",noFillers:"Keine Füllertruppen gefunden.",noLeader:"Keine Anführertruppen gefunden.",
 troopDistribution:"Empfohlene Truppenverteilung",
 copyAll:"Anführer + Füller",copyFillers:"Nur Füller",
-enemyFocus:"Gegnerfokus",
+enemyFocus:"Gegnerfokus",enemyComposition:"Gegnerische Mischung",
 counterLevel:"Konterstufe",
 counterAdvantage:"Kontervorteil",
 stageBalanced:"Ausgeglichen",
@@ -442,10 +469,11 @@ donateText:"Wenn dir dieses Tool geholfen hat, kannst du die Weiterentwicklung m
 donateBtn:"💛 Spenden",
 laterBtn:"✖ Jetzt nicht",
 installTitle:"📲 Battle Counter installieren",
+quickPresets:"Schnellauswahl (Infanterie / Kavallerie / Bogenschützen)",
 installStep1:"1️⃣ Tippe auf den Share-Button ⬆️",
 installStep2:"2️⃣ Wähle 'Zum Home-Bildschirm'",
 installStep3:"3️⃣ Tippe auf 'Hinzufügen'",
-installOk:"OK",
+installOk:"OK",installUnavailable:"Die Installation ist auf diesem Gerät nicht verfügbar.",
 
 helpPopup:`
 <h2>📊 Wo finde ich die Prozentwerte der gegnerischen Truppen?</h2>
@@ -455,7 +483,7 @@ helpPopup:`
 2. Scrolle bis <b>„Schwadron insgesamt“</b>.<br><br>
 3. Tippe auf das kleine <b>ⓘ</b>-Symbol.<br><br>
 4. Es öffnet sich ein Fenster mit den Prozentwerten der gegnerischen Truppen.<br><br>
-5. Übertrage die Prozentwerte für Infanterie, Kavallerie und Schützen in den Konterrechner.
+5. Übertrage die Prozentwerte für Infanterie, Kavallerie und Bogenschützen in den Konterrechner.
 </p>
 <img src="help.png.PNG" alt="Hilfe" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
 <button id="closeHelpBtn">Schließen</button>
@@ -464,23 +492,23 @@ helpPopup:`
 en:{
 title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
 lang:"Language",
-inf:"Infantry (%)",cav:"Cavalry (%)",arc:"Marksmen (%)",
+inf:"Infantry (%)",cav:"Cavalry (%)",arc:"Archers (%)",
 mode:"Mode",
 target:"Target",
 tier:"Enemy Tier",
 same:"Same Tier",
 plus1:"Enemy +1 Tier",
-info:"Enter the enemy troop percentages below.",
+info:"Enter the enemy troop percentages below.",percentRequired:"Troop percentages must add up to 100%.",
 castle:"🏰 Castle",
 outpost:"🏕️ Outpost",
 shrine:"🏛️ Shrine / Fortress",
 allout:"⚔️ All Out (Event)",
 calc:"Calculate Counter",
 rally:"🏰 Rally Leader",solo:"⚔️ Solo (Castle)",
-lead:"Recommended Main Troop",dist:"Leader",fill:"Fillers",counter:"Counters",copy:"Copy to Chat",copied:"Copied!",
+lead:"Recommended Main Troop",dist:"Leader",fill:"Fillers",counter:"Counters",copy:"Copy to Chat",copied:"Copied!",noFillers:"No filler troops found.",noLeader:"No leader troops found.",
 troopDistribution:"Recommended Troop Distribution",
 copyAll:"Leader + Fillers",copyFillers:"Fillers only",
-enemyFocus:"Enemy Focus",
+enemyFocus:"Enemy Focus",enemyComposition:"Enemy Mix",
 counterLevel:"Counter Level",
 counterAdvantage:"Counter Advantage",
 stageBalanced:"Balanced Counter",
@@ -501,10 +529,11 @@ donateText:"If this tool has been helpful to you, you can support future updates
 donateBtn:"💛 Donate",
 laterBtn:"✖ Not now",
 installTitle:"📲 Install Battle Counter",
+quickPresets:"Quick sets (Infantry / Cavalry / Archers)",
 installStep1:"1️⃣ Tap the Share button ⬆️",
 installStep2:"2️⃣ Choose 'Add to Home Screen'",
 installStep3:"3️⃣ Tap 'Add'",
-installOk:"OK",
+installOk:"OK",installUnavailable:"Installation is not available on this device.",
 
 helpPopup:`
 <h2>📊 Where can I find the enemy troop percentages?</h2>
@@ -514,32 +543,32 @@ helpPopup:`
 2. Scroll down to <b>Squad Total</b>.<br><br>
 3. Tap the small <b>ⓘ</b> icon.<br><br>
 4. A window will open showing the enemy troop percentages.<br><br>
-5. Enter the Infantry, Cavalry and Marksmen percentages into the Counter Tool.
+5. Enter the Infantry, Cavalry and Archers percentages into the Counter Tool.
 </p>
 <img src="help.png.PNG" alt="Help" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
 <button id="closeHelpBtn">Close</button>
 `,
 },
 es:{
-title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
+title:`⚔️ Batalla<br><span class="subtitle">Contraataque ⚔️</span>`,
 lang:"Idioma",
-inf:"Infantería (%)",cav:"Caballería (%)",arc:"Tiradores (%)",
+inf:"Infantería (%)",cav:"Caballería (%)",arc:"Arqueros (%)",
 mode:"Modo",
 target:"Objetivo",
 tier:"Nivel enemigo",
 same:"Mismo nivel",
 plus1:"Enemigo +1 nivel",
-info:"Introduce los porcentajes de tropas enemigas.",
+info:"Introduce los porcentajes de tropas enemigas.",percentRequired:"Los porcentajes de tropas deben sumar 100 %.",
 castle:"🏰 Castillo",
 outpost:"🏕️ Puesto avanzado",
 shrine:"🏛️ Santuario / Fortaleza",
 allout:"⚔️ All Out (Evento)",
 calc:"Calcular Contraataque",
 rally:"🏰 Líder de Rally",solo:"⚔️ Solo (Castillo)",
-lead:"Tropa principal recomendada",dist:"Líder",fill:"Participantes",counter:"Contrarresta",copy:"Copiar al chat",copied:"¡Copiado!",
+lead:"Tropa principal recomendada",dist:"Líder",fill:"Participantes",counter:"Contrarresta",copy:"Copiar al chat",copied:"¡Copiado!",noFillers:"No se encontraron tropas participantes.",noLeader:"No se encontraron tropas del líder.",
 troopDistribution:"Distribución recomendada de tropas",
 copyAll:"Líder + Participantes",copyFillers:"Solo participantes",
-enemyFocus:"Enfoque enemigo",
+enemyFocus:"Enfoque enemigo",enemyComposition:"Mezcla enemiga",
 counterLevel:"Nivel de contraataque",
 counterAdvantage:"Ventaja de contraataque",
 stageBalanced:"Equilibrado",
@@ -560,10 +589,11 @@ donateText:"Si esta herramienta te ha sido útil, puedes apoyar futuras actualiz
 donateBtn:"💛 Donar",
 laterBtn:"✖ Ahora no",
 installTitle:"📲 Instalar Battle Counter",
+quickPresets:"Selección rápida (Infantería / Caballería / Arqueros)",
 installStep1:"1️⃣ Pulsa el botón Share ⬆️",
 installStep2:"2️⃣ Selecciona 'Añadir a pantalla de inicio'",
 installStep3:"3️⃣ Pulsa 'Añadir'",
-installOk:"OK",
+installOk:"OK",installUnavailable:"La instalación no está disponible en este dispositivo.",
 
 helpPopup:`
 <h2>📊 ¿Dónde puedo encontrar los porcentajes de las tropas enemigas?</h2>
@@ -573,32 +603,32 @@ helpPopup:`
 2. Desplázate hasta <b>«Escuadrón total»</b>.<br><br>
 3. Pulsa el pequeño icono <b>ⓘ</b>.<br><br>
 4. Se abrirá una ventana con los porcentajes de las tropas enemigas.<br><br>
-5. Introduce los porcentajes de Infantería, Caballería y Tiradores en la Calculadora de Contraataque.
+5. Introduce los porcentajes de Infantería, Caballería y Arqueros en la Calculadora de Contraataque.
 </p>
 <img src="help.png.PNG" alt="Ayuda" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
 <button id="closeHelpBtn">Cerrar</button>
 `,
 },
 ko:{
-title:`⚔️ Battle<br><span class="subtitle">Counter ⚔️</span>`,
+title:`⚔️ 전투<br><span class="subtitle">카운터 ⚔️</span>`,
 lang:"언어",
-inf:"보병 (%)",cav:"기병 (%)",arc:"궁병 (%)",
+inf:"보병 (%)",cav:"기병 (%)",arc:"궁수 (%)",
 mode:"모드",
 target:"목표",
 tier:"적군 등급",
 same:"동일 등급",
 plus1:"적군 +1 등급",
-info:"먼저 적군의 병력 비율을 백분율로 입력하세요.",
+info:"먼저 적군의 병력 비율을 백분율로 입력하세요.",percentRequired:"병력 비율의 합은 100%여야 합니다.",
 castle:"🏰 성",
 outpost:"🏕️ 전초기지",
 shrine:"🏛️ 성소 / 요새",
 allout:"⚔️ All Out (이벤트)",
 calc:"카운터 계산",
 rally:"🏰 랠리 리더",solo:"⚔️ 솔로 (성)",
-lead:"추천 주력 부대",dist:"리더",fill:"참가자",counter:"카운터",copy:"채팅에 복사",copied:"복사 완료!",
+lead:"추천 주력 부대",dist:"리더",fill:"참가자",counter:"카운터",copy:"채팅에 복사",copied:"복사 완료!",noFillers:"참가자 병력을 찾을 수 없습니다.",noLeader:"리더 병력을 찾을 수 없습니다.",
 troopDistribution:"추천 병력 배분",
 copyAll:"리더 + 참가자",copyFillers:"참가자만",
-enemyFocus:"적군 주력",
+enemyFocus:"적군 주력",enemyComposition:"적군 병력 구성",
 counterLevel:"카운터 단계",
 counterAdvantage:"카운터 우위",
 stageBalanced:"균형",
@@ -619,10 +649,11 @@ donateText:"이 도구가 도움이 되었다면 자발적인 후원으로 프�
 donateBtn:"후원",
 laterBtn:"나중에",
 installTitle:"📲 Battle Counter 설치",
+quickPresets:"빠른 선택 (보병 / 기병 / 궁수)",
 installStep1:"1️⃣ 공유 버튼 ⬆️ 을 누르세요",
 installStep2:"2️⃣ '홈 화면에 추가'를 선택하세요",
 installStep3:"3️⃣ '추가'를 누르세요",
-installOk:"확인",
+installOk:"확인",installUnavailable:"이 기기에서는 설치할 수 없습니다.",
 
 helpPopup:`
 <h2>📊 적군 병력 비율은 어디에서 확인할 수 있나요?</h2>
@@ -632,11 +663,156 @@ helpPopup:`
 2. <b>전체 부대</b>까지 스크롤합니다.<br><br>
 3. 작은 <b>ⓘ</b> 아이콘을 누릅니다.<br><br>
 4. 적군 병력의 비율이 표시된 창이 열립니다.<br><br>
-5. 보병, 기병, 궁병의 비율을 카운터 도구에 입력합니다.
+5. 보병, 기병, 궁수의 비율을 카운터 도구에 입력합니다.
 </p>
 
 <img src="help.png.PNG" alt="도움말" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
 <button id="closeHelpBtn">닫기</button>
+`,
+},
+zh:{
+title:`⚔️ 战斗克制计算器`,
+lang:"语言",
+inf:"步兵 (%)",cav:"骑兵 (%)",arc:"弓兵 (%)",
+mode:"模式",target:"目标",tier:"敌军等级",same:"同等级",plus1:"敌军高 1 级",
+info:"请先输入敌军的兵种比例。",percentRequired:"各兵种百分比总和必须为 100%。",
+castle:"🏰 城堡",outpost:"🏕️ 前哨",shrine:"🏛️ 圣所 / 要塞",allout:"⚔️ 全力出击（活动）",
+calc:"计算克制阵容",rally:"🏰 集结队长",solo:"⚔️ 单人（城堡）",
+lead:"推荐主力部队",dist:"队长",fill:"集结成员",counter:"克制",copy:"复制到聊天",copied:"已复制！",noFillers:"未找到集结成员部队。",noLeader:"未找到队长部队。",
+troopDistribution:"推荐兵力分配",copyAll:"队长 + 集结成员",copyFillers:"仅集结成员",
+enemyFocus:"敌军重点",enemyComposition:"敌军混合编队",counterLevel:"克制等级",counterAdvantage:"克制优势",
+stageBalanced:"均衡",stageLight:"轻度",stageMedium:"中度",stageHeavy:"强力",enemyWeakness:"敌军弱点",
+advMinimal:"⚪ 未发现明显弱点",advGood:"🔵 弱点较小",advStrong:"🟢 弱点明显",advExcellent:"🟣 弱点很大",
+guideShow:"▼ 显示快速指南",guideHide:"▲ 隐藏快速指南",help:"如何查看敌军兵力比例",
+donateTitle:"支持项目",donateText:"如果这个工具对你有帮助，可以通过自愿捐赠支持后续开发。<br><br>你的支持有助于项目持续运行并开发新功能。<br><br>非常感谢！❤️",
+donateBtn:"💛 捐赠",laterBtn:"✖ 暂不捐赠",installTitle:"📲 安装 Battle Counter",
+quickPresets:"快速选择（步兵 / 骑兵 / 弓兵）",
+installStep1:"1️⃣ 点击分享按钮 ⬆️",installStep2:"2️⃣ 选择“添加到主屏幕”",installStep3:"3️⃣ 点击“添加”",installOk:"好的",installUnavailable:"此设备暂不支持安装。",
+helpPopup:`
+<h2>📊 在哪里查看敌军兵力百分比？</h2>
+<p>1. 打开战斗报告。<br><br>2. 滚动到 <b>Squad Total</b>。<br><br>3. 点击小的 <b>ⓘ</b> 图标。<br><br>4. 窗口中会显示敌军各兵种的百分比。<br><br>5. 将步兵、骑兵和弓兵的百分比输入克制计算器。</p>
+<img src="help.png.PNG" alt="帮助" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
+<button id="closeHelpBtn">关闭</button>
+`,
+},
+fil:{
+title:`⚔️ Kontra ng Labanan`,
+lang:"Wika",inf:"Impanterya (%)",cav:"Kabalyerya (%)",arc:"Mamamana (%)",
+mode:"Mode",target:"Target",tier:"Antas ng Kalaban",same:"Parehong antas",plus1:"Kalaban +1 antas",
+info:"Ilagay muna ang porsiyento ng mga tropa ng kalaban.",percentRequired:"Dapat umabot sa 100% ang kabuuang porsiyento ng mga tropa.",
+castle:"🏰 Kastilyo",outpost:"🏕️ Outpost",shrine:"🏛️ Dambana / Kuta",allout:"⚔️ All Out (Event)",
+calc:"Kalkulahin ang Kontra",rally:"🏰 Pinuno ng Rally",solo:"⚔️ Solo (Kastilyo)",
+lead:"Inirerekomendang Pangunahing Tropa",dist:"Pinuno",fill:"Mga Kasali",counter:"Kontra",copy:"Kopyahin sa Chat",copied:"Nakopya!",noFillers:"Walang nakitang tropa ng mga kasali.",noLeader:"Walang nakitang tropa ng pinuno.",
+troopDistribution:"Inirerekomendang Hati ng mga Tropa",copyAll:"Pinuno + Mga Kasali",copyFillers:"Mga Kasali lang",
+enemyFocus:"Pokus ng Kalaban",enemyComposition:"Halo ng mga Tropa ng Kalaban",counterLevel:"Antas ng Kontra",counterAdvantage:"Lamang sa Kontra",
+stageBalanced:"Balanse",stageLight:"Bahagya",stageMedium:"Katamtaman",stageHeavy:"Malakas",enemyWeakness:"Kahinaan ng Kalaban",
+advMinimal:"⚪ Walang malinaw na kahinaan",advGood:"🔵 Bahagyang kahinaan",advStrong:"🟢 Malinaw na kahinaan",advExcellent:"🟣 Malaking kahinaan",
+guideShow:"▼ Ipakita ang Mabilis na Gabay",guideHide:"▲ Itago ang Mabilis na Gabay",help:"Paano hanapin ang porsiyento ng tropa ng kalaban",
+donateTitle:"Suportahan ang Proyekto",donateText:"Kung nakatulong sa iyo ang tool na ito, maaari mong suportahan ang mga susunod na update sa pamamagitan ng kusang-loob na donasyon.<br><br>Tumutulong ang suporta mo na mapanatili ang proyekto at makagawa ng mga bagong feature.<br><br>Maraming salamat! ❤️",
+donateBtn:"💛 Mag-donate",laterBtn:"✖ Huwag muna",installTitle:"📲 I-install ang Battle Counter",
+quickPresets:"Mabilis na piliin (Imp. / Kab. / Mamamana)",
+installStep1:"1️⃣ Pindutin ang Share button ⬆️",installStep2:"2️⃣ Piliin ang 'Add to Home Screen'",installStep3:"3️⃣ Pindutin ang 'Add'",installOk:"Sige",installUnavailable:"Hindi available ang pag-install sa device na ito.",
+helpPopup:`
+<h2>📊 Saan makikita ang porsiyento ng mga tropa ng kalaban?</h2>
+<p>1. Buksan ang battle report.<br><br>2. Mag-scroll pababa sa <b>Squad Total</b>.<br><br>3. Pindutin ang maliit na <b>ⓘ</b> icon.<br><br>4. Lalabas ang porsiyento ng mga tropa ng kalaban.<br><br>5. Ilagay sa Counter Tool ang porsiyento ng Impanterya, Kabalyerya at Mamamana.</p>
+<img src="help.png.PNG" alt="Tulong" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
+<button id="closeHelpBtn">Isara</button>
+`,
+},
+th:{
+title:`⚔️ เครื่องคำนวณตัวแก้ทาง`,
+lang:"ภาษา",inf:"ทหารราบ (%)",cav:"ทหารม้า (%)",arc:"พลธนู (%)",
+mode:"โหมด",target:"เป้าหมาย",tier:"ระดับศัตรู",same:"ระดับเดียวกัน",plus1:"ศัตรูสูงกว่า 1 ระดับ",
+info:"กรอกสัดส่วนทหารของศัตรูก่อน",percentRequired:"เปอร์เซ็นต์ทหารรวมกันต้องเท่ากับ 100%",
+castle:"🏰 ปราสาท",outpost:"🏕️ ป้อมหน้า",shrine:"🏛️ วิหาร / ป้อมปราการ",allout:"⚔️ All Out (อีเวนต์)",
+calc:"คำนวณตัวแก้ทาง",rally:"🏰 ผู้นำแรลลี่",solo:"⚔️ โซโล (ปราสาท)",
+lead:"กองกำลังหลักที่แนะนำ",dist:"ผู้นำ",fill:"ผู้เข้าร่วม",counter:"ตัวแก้ทาง",copy:"คัดลอกไปแชต",copied:"คัดลอกแล้ว!",noFillers:"ไม่พบกองกำลังของผู้เข้าร่วม",noLeader:"ไม่พบกองกำลังของผู้นำ",
+troopDistribution:"สัดส่วนทหารที่แนะนำ",copyAll:"ผู้นำ + ผู้เข้าร่วม",copyFillers:"เฉพาะผู้เข้าร่วม",
+enemyFocus:"จุดเน้นของศัตรู",enemyComposition:"กองทัพศัตรูแบบผสม",counterLevel:"ระดับการแก้ทาง",counterAdvantage:"ความได้เปรียบในการแก้ทาง",
+stageBalanced:"สมดุล",stageLight:"เล็กน้อย",stageMedium:"ปานกลาง",stageHeavy:"สูง",enemyWeakness:"จุดอ่อนของศัตรู",
+advMinimal:"⚪ ไม่พบจุดอ่อนชัดเจน",advGood:"🔵 จุดอ่อนเล็กน้อย",advStrong:"🟢 จุดอ่อนชัดเจน",advExcellent:"🟣 จุดอ่อนมาก",
+guideShow:"▼ แสดงคู่มือฉบับย่อ",guideHide:"▲ ซ่อนคู่มือฉบับย่อ",help:"วิธีดูสัดส่วนทหารของศัตรู",
+donateTitle:"สนับสนุนโครงการ",donateText:"หากเครื่องมือนี้มีประโยชน์ คุณสามารถสนับสนุนการพัฒนาด้วยการบริจาคตามความสมัครใจได้<br><br>การสนับสนุนของคุณช่วยให้โครงการดำเนินต่อไปและพัฒนาฟีเจอร์ใหม่ ๆ<br><br>ขอบคุณมาก! ❤️",
+donateBtn:"💛 บริจาค",laterBtn:"✖ ไว้ก่อน",installTitle:"📲 ติดตั้ง Battle Counter",
+quickPresets:"เลือกด่วน (ทหารราบ / ทหารม้า / พลธนู)",
+installStep1:"1️⃣ แตะปุ่มแชร์ ⬆️",installStep2:"2️⃣ เลือก 'เพิ่มไปยังหน้าจอโฮม'",installStep3:"3️⃣ แตะ 'เพิ่ม'",installOk:"ตกลง",installUnavailable:"อุปกรณ์นี้ไม่รองรับการติดตั้ง",
+helpPopup:`
+<h2>📊 ดูเปอร์เซ็นต์ทหารของศัตรูได้ที่ไหน?</h2>
+<p>1. เปิดรายงานการต่อสู้<br><br>2. เลื่อนลงไปที่ <b>Squad Total</b><br><br>3. แตะไอคอน <b>ⓘ</b><br><br>4. หน้าต่างจะแสดงเปอร์เซ็นต์ทหารของศัตรู<br><br>5. กรอกเปอร์เซ็นต์ทหารราบ ทหารม้า และพลธนูในเครื่องคำนวณ</p>
+<img src="help.png.PNG" alt="ช่วยเหลือ" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
+<button id="closeHelpBtn">ปิด</button>
+`,
+},
+tr:{
+title:`⚔️ Savaş Karşılık Hesaplayıcı`,
+lang:"Dil",inf:"Piyade (%)",cav:"Süvari (%)",arc:"Okçular (%)",
+mode:"Mod",target:"Hedef",tier:"Düşman Seviyesi",same:"Aynı Seviye",plus1:"Düşman +1 Seviye",
+info:"Önce düşman birliklerinin yüzdelerini girin.",percentRequired:"Birlik yüzdelerinin toplamı %100 olmalıdır.",
+castle:"🏰 Kale",outpost:"🏕️ Karakol",shrine:"🏛️ Tapınak / Hisar",allout:"⚔️ All Out (Etkinlik)",
+calc:"Karşı Dizilimi Hesapla",rally:"🏰 Ralli Lideri",solo:"⚔️ Tek Başına (Kale)",
+lead:"Önerilen Ana Birlik",dist:"Lider",fill:"Katılımcılar",counter:"Karşılık",copy:"Sohbete Kopyala",copied:"Kopyalandı!",noFillers:"Katılımcı birlik bulunamadı.",noLeader:"Lider birliği bulunamadı.",
+troopDistribution:"Önerilen Birlik Dağılımı",copyAll:"Lider + Katılımcılar",copyFillers:"Yalnızca Katılımcılar",
+enemyFocus:"Düşman Odağı",enemyComposition:"Düşman Karma Dizilimi",counterLevel:"Karşılık Seviyesi",counterAdvantage:"Karşılık Avantajı",
+stageBalanced:"Dengeli",stageLight:"Hafif",stageMedium:"Orta",stageHeavy:"Ağır",enemyWeakness:"Düşmanın Zayıflığı",
+advMinimal:"⚪ Belirgin zayıflık yok",advGood:"🔵 Küçük zayıflık",advStrong:"🟢 Belirgin zayıflık",advExcellent:"🟣 Büyük zayıflık",
+guideShow:"▼ Hızlı Rehberi Göster",guideHide:"▲ Hızlı Rehberi Gizle",help:"Düşman birlik yüzdeleri nasıl bulunur",
+donateTitle:"Projeyi Destekle",donateText:"Bu araç işinize yaradıysa, gönüllü bir bağışla gelecekteki geliştirmeleri destekleyebilirsiniz.<br><br>Desteğiniz projenin sürmesine ve yeni özelliklerin geliştirilmesine yardımcı olur.<br><br>Çok teşekkürler! ❤️",
+donateBtn:"💛 Bağış Yap",laterBtn:"✖ Şimdi Değil",installTitle:"📲 Battle Counter'ı Yükle",
+quickPresets:"Hızlı seçim (Piyade / Süvari / Okçular)",
+installStep1:"1️⃣ Paylaş düğmesine dokunun ⬆️",installStep2:"2️⃣ 'Ana Ekrana Ekle'yi seçin",installStep3:"3️⃣ 'Ekle'ye dokunun",installOk:"Tamam",installUnavailable:"Bu cihazda yükleme kullanılamıyor.",
+helpPopup:`
+<h2>📊 Düşman birlik yüzdelerini nerede bulabilirim?</h2>
+<p>1. Savaş raporunu açın.<br><br>2. <b>Squad Total</b> bölümüne ilerleyin.<br><br>3. Küçük <b>ⓘ</b> simgesine dokunun.<br><br>4. Düşman birlik yüzdelerini gösteren bir pencere açılır.<br><br>5. Piyade, Süvari ve Okçu yüzdelerini Karşılık Aracı'na girin.</p>
+<img src="help.png.PNG" alt="Yardım" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
+<button id="closeHelpBtn">Kapat</button>
+`,
+},
+ru:{
+title:`⚔️ Калькулятор контратак`,
+lang:"Язык",inf:"Пехота (%)",cav:"Кавалерия (%)",arc:"Лучники (%)",
+mode:"Режим",target:"Цель",tier:"Уровень противника",same:"Тот же уровень",plus1:"Противник на уровень выше",
+info:"Сначала укажите процентный состав войск противника.",percentRequired:"Сумма процентов войск должна составлять 100%.",
+castle:"🏰 Замок",outpost:"🏕️ Аванпост",shrine:"🏛️ Святилище / Крепость",allout:"⚔️ All Out (событие)",
+calc:"Рассчитать контратаку",rally:"🏰 Лидер ралли",solo:"⚔️ Одиночная атака (замок)",
+lead:"Рекомендуемый основной отряд",dist:"Лидер",fill:"Участники",counter:"Контратака",copy:"Скопировать в чат",copied:"Скопировано!",noFillers:"Отряд участников не найден.",noLeader:"Отряд лидера не найден.",
+troopDistribution:"Рекомендуемое распределение войск",copyAll:"Лидер + участники",copyFillers:"Только участники",
+enemyFocus:"Основной тип войск противника",enemyComposition:"Смешанный состав противника",counterLevel:"Уровень контратаки",counterAdvantage:"Преимущество контратаки",
+stageBalanced:"Сбалансированный",stageLight:"Небольшое",stageMedium:"Среднее",stageHeavy:"Сильное",enemyWeakness:"Слабость противника",
+advMinimal:"⚪ Явной слабости нет",advGood:"🔵 Небольшая слабость",advStrong:"🟢 Заметная слабость",advExcellent:"🟣 Большая слабость",
+guideShow:"▼ Показать краткую справку",guideHide:"▲ Скрыть краткую справку",help:"Как найти проценты войск противника",
+donateTitle:"Поддержать проект",donateText:"Если этот инструмент оказался полезен, вы можете поддержать его дальнейшее развитие добровольным пожертвованием.<br><br>Ваша поддержка помогает проекту работать и развивать новые функции.<br><br>Большое спасибо! ❤️",
+donateBtn:"💛 Пожертвовать",laterBtn:"✖ Не сейчас",installTitle:"📲 Установить Battle Counter",
+quickPresets:"Быстрый выбор (пехота / кавалерия / лучники)",
+installStep1:"1️⃣ Нажмите кнопку «Поделиться» ⬆️",installStep2:"2️⃣ Выберите «На экран Домой»",installStep3:"3️⃣ Нажмите «Добавить»",installOk:"ОК",installUnavailable:"Установка на этом устройстве недоступна.",
+helpPopup:`
+<h2>📊 Где посмотреть процентный состав войск противника?</h2>
+<p>1. Откройте отчет о битве.<br><br>2. Прокрутите до раздела <b>Squad Total</b>.<br><br>3. Нажмите маленький значок <b>ⓘ</b>.<br><br>4. Откроется окно с процентами войск противника.<br><br>5. Введите проценты пехоты, кавалерии и лучников в калькулятор контратак.</p>
+<img src="help.png.PNG" alt="Справка" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
+<button id="closeHelpBtn">Закрыть</button>
+`,
+},
+vi:{
+title:`⚔️ Bộ đếm phản công` ,
+lang:"Ngôn ngữ",inf:"Bộ binh (%)",cav:"Kỵ binh (%)",arc:"Cung thủ (%)",
+mode:"Chế độ",target:"Mục tiêu",tier:"Cấp độ của địch",same:"Cùng cấp",plus1:"Địch cao hơn 1 cấp",
+info:"Nhập tỷ lệ phần trăm quân đội của địch bên dưới.",percentRequired:"Tổng tỷ lệ quân phải bằng 100%.",
+castle:"🏰 Lâu đài",outpost:"🏕️ Tiền đồn",shrine:"🏛️ Thánh điện / Pháo đài",allout:"⚔️ Tổng lực (Sự kiện)",
+calc:"Tính phản công",rally:"🏰 Thủ lĩnh Rally",solo:"⚔️ Đánh đơn (Lâu đài)",
+lead:"Đội quân chính được đề xuất",dist:"Thủ lĩnh",fill:"Quân tiếp viện",counter:"Khắc chế",copy:"Sao chép vào chat",copied:"Đã sao chép!",noFillers:"Không tìm thấy quân tiếp viện.",noLeader:"Không tìm thấy quân của thủ lĩnh.",
+troopDistribution:"Phân bổ quân được đề xuất",copyAll:"Thủ lĩnh + quân tiếp viện",copyFillers:"Chỉ quân tiếp viện",
+enemyFocus:"Quân chủ lực của địch",enemyComposition:"Đội hình quân địch",counterLevel:"Cấp độ phản công",counterAdvantage:"Lợi thế phản công",
+stageBalanced:"Phản công cân bằng",stageLight:"Nhẹ",stageMedium:"Trung bình",stageHeavy:"Mạnh",enemyWeakness:"Điểm yếu của địch",
+advMinimal:"⚪ Không có điểm yếu rõ ràng",advGood:"🔵 Điểm yếu nhỏ",advStrong:"🟢 Điểm yếu rõ rệt",advExcellent:"🟣 Điểm yếu lớn",
+guideShow:"▼ Hiện hướng dẫn nhanh",guideHide:"▲ Ẩn hướng dẫn nhanh",help:"Cách tìm tỷ lệ quân của địch",
+donateTitle:"Ủng hộ dự án",donateText:"Nếu công cụ này hữu ích với bạn, bạn có thể tự nguyện quyên góp để hỗ trợ phát triển trong tương lai.<br><br>Sự ủng hộ của bạn giúp duy trì dự án và phát triển các tính năng mới.<br><br>Xin cảm ơn! ❤️",
+donateBtn:"💛 Quyên góp",laterBtn:"✖ Để sau",installTitle:"📲 Cài đặt Battle Counter",
+quickPresets:"Chọn nhanh (Bộ binh / Kỵ binh / Cung thủ)",
+installStep1:"1️⃣ Nhấn nút Chia sẻ ⬆️",installStep2:"2️⃣ Chọn 'Thêm vào Màn hình chính'",installStep3:"3️⃣ Nhấn 'Thêm'",installOk:"OK",installUnavailable:"Thiết bị này không hỗ trợ cài đặt.",
+helpPopup:`
+<h2>📊 Tìm tỷ lệ quân của địch ở đâu?</h2>
+<p>1. Mở báo cáo chiến đấu.<br><br>2. Cuộn đến mục <b>Squad Total</b>.<br><br>3. Nhấn biểu tượng <b>ⓘ</b> nhỏ.<br><br>4. Một cửa sổ sẽ hiện tỷ lệ phần trăm quân của địch.<br><br>5. Nhập tỷ lệ Bộ binh, Kỵ binh và Cung thủ vào công cụ phản công.</p>
+<img src="help.png.PNG" alt="Trợ giúp" style="display:block;width:100%;height:auto;border-radius:12px;margin:20px 0;">
+<button id="closeHelpBtn">Đóng</button>
 `,
 },
 };
@@ -658,6 +834,8 @@ infoBox.innerText = t.info;
 helpBtn.innerText = "ⓘ " + t.help;
 helpContent.innerHTML = t.helpPopup;
 document.getElementById("installTitle").innerHTML = t.installTitle;
+document.getElementById("installBtn").title = t.installTitle;
+document.getElementById("quickPresetsLabel").innerText = t.quickPresets;
 
 document.getElementById("installText").innerHTML =
         "<b>iPhone / iPad</b><br><br>" +
@@ -676,6 +854,9 @@ if(document.getElementById("supportTitle")){
 }
 guideHeader.innerText = guideOpen ? t.guideHide : t.guideShow;
 calcBtn.innerText=t.calc;
+document.getElementById("copyOptionsTitle").innerText=t.copy;
+document.getElementById("copyAllLabel").lastChild.textContent=" "+t.copyAll;
+document.getElementById("copyFillersLabel").lastChild.textContent=" "+t.copyFillers;
 
 mode.innerHTML="";
 mode.add(new Option(t.rally,"rally"));
@@ -693,9 +874,6 @@ enemyTier.add(new Option(t.plus1,"plus1"));
 enemyTier.value = currentEnemyTier || "same";
 if(copyBtn.style.display!=="none"){
     copyBtn.innerText=t.copy;
-    document.getElementById("copyOptionsTitle").innerText=t.copy;
-    document.getElementById("copyAllLabel").lastChild.textContent=" "+t.copyAll;
-    document.getElementById("copyFillersLabel").lastChild.textContent=" "+t.copyFillers;
 }
 
 // Ergebnis nicht löschen
@@ -764,7 +942,7 @@ margin-bottom:20px;
 line-height:1.5;">
 Unofficial fan-made tool for Kingshot.<br>
 Kingshot is a trademark of its respective owner.
-<br><span style="font-size:11px;color:#9ca3af;">Version 1.3.0</span>
+<br><span id="appVersion" style="font-size:11px;color:#9ca3af;"></span>
 </div>
 <!-- Install Popup -->
 
@@ -814,6 +992,9 @@ Thank you very much! ❤️
 </div>
 </div>
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("appVersion").textContent = `Version ${APP_VERSION}`;
+});
 document.getElementById("secretSupport").onclick = function () {
     document.getElementById("supportPopup").style.display = "flex";
 };
@@ -851,7 +1032,7 @@ document.getElementById("installBtn").onclick = async function () {
         deferredPrompt = null;
         this.style.display = "none";
     } else {
-        alert("Installation is not available on this device.");
+        alert(text[lang.value].installUnavailable);
     }
 };
 
@@ -860,5 +1041,7 @@ function closeInstallPopup() {
 }
 </script>
 <script src="counter.js"></script>
+<script src="mixed-advice.js"></script>
+<script src="preferences.js"></script>
 </body>
 </html>

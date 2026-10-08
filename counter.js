@@ -14,20 +14,37 @@ const out = document.getElementById("out");
 const copyBtn = document.getElementById("copyBtn");
 
 function autoFill(changed){
-    let i = parseInt(inf.value) || 0;
-    let c = parseInt(cav.value) || 0;
-    let a = parseInt(arc.value) || 0;
+    const clampPercent = value => Math.max(0, Math.min(100, parseInt(value, 10) || 0));
+    let i = clampPercent(inf.value);
+    let c = clampPercent(cav.value);
+    let a = clampPercent(arc.value);
+
+    inf.value = i;
+    cav.value = c;
+    arc.value = a;
 
     if(changed==="inf"){
-        if(i + c <= 100) arc.value = 100 - i - c;
+        if(i + c > 100){
+            i = 100 - c;
+            inf.value = i;
+        }
+        arc.value = 100 - i - c;
     }
 
     if(changed==="cav"){
-        if(i + c <= 100) arc.value = 100 - i - c;
+        if(i + c > 100){
+            c = 100 - i;
+            cav.value = c;
+        }
+        arc.value = 100 - i - c;
     }
 
     if(changed==="arc"){
-        if(i + a <= 100) cav.value = 100 - i - a;
+        if(i + a > 100){
+            a = 100 - i;
+            arc.value = a;
+        }
+        cav.value = 100 - i - a;
     }
 }
 
@@ -35,7 +52,7 @@ function calc(){
 let i=+inf.value,c=+cav.value,a=+arc.value;
 
 if(i+c+a!==100){
-    out.innerHTML="<b>100% required.</b>";
+    out.innerHTML="<b>"+text[lang.value].percentRequired+"</b>";
     return;
 }
 
@@ -51,24 +68,31 @@ if (allout) {
     return;
 }
 
-const vals={Infantry:i,Cavalry:c,Marksmen:a};
+const vals={Infantry:i,Cavalry:c,Archers:a};
 const sorted=Object.entries(vals).sort((x,y)=>y[1]-x[1]);
 const enemy=sorted[0][0];
 const highest=sorted[0][1];
 const second = sorted[1][1];
 const gap = highest - second;
+const twoTypeTie = highest === second && sorted[2][1] === 0;
 
 const counter={
-"Infantry":"Marksmen",
-"Marksmen":"Cavalry",
+"Infantry":"Archers",
+"Archers":"Cavalry",
 "Cavalry":"Infantry"
 };
 
 const names={
-de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Marksmen:"Schützen"},
-en:{Infantry:"Infantry",Cavalry:"Cavalry",Marksmen:"Marksmen"},
-es:{Infantry:"Infantería",Cavalry:"Caballería",Marksmen:"Tiradores"},
-ko:{Infantry:"보병",Cavalry:"기병",Marksmen:"궁병"}
+de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Archers:"Bogenschützen"},
+en:{Infantry:"Infantry",Cavalry:"Cavalry",Archers:"Archers"},
+es:{Infantry:"Infantería",Cavalry:"Caballería",Archers:"Arqueros"},
+ko:{Infantry:"보병",Cavalry:"기병",Archers:"궁수"},
+zh:{Infantry:"步兵",Cavalry:"骑兵",Archers:"弓兵"},
+fil:{Infantry:"Impanterya",Cavalry:"Kabalyerya",Archers:"Mamamana"},
+th:{Infantry:"ทหารราบ",Cavalry:"ทหารม้า",Archers:"พลธนู"},
+tr:{Infantry:"Piyade",Cavalry:"Süvari",Archers:"Okçular"},
+ru:{Infantry:"Пехота",Cavalry:"Кавалерия",Archers:"Лучники"},
+vi:{Infantry:"Bộ binh",Cavalry:"Kỵ binh",Archers:"Cung thủ"}
 };
 
 let l=lang.value,t=text[l];
@@ -180,8 +204,8 @@ let main=counter[enemy];
 
 if(highest === second){
     if(
-        (enemy === "Infantry" && sorted[1][0] === "Marksmen") ||
-        (enemy === "Marksmen" && sorted[1][0] === "Infantry")
+        (enemy === "Infantry" && sorted[1][0] === "Archers") ||
+        (enemy === "Archers" && sorted[1][0] === "Infantry")
     ){
         main = "Cavalry";
     }
@@ -189,7 +213,7 @@ if(highest === second){
         (enemy === "Infantry" && sorted[1][0] === "Cavalry") ||
         (enemy === "Cavalry" && sorted[1][0] === "Infantry")
     ){
-        main = "Marksmen";
+        main = "Archers";
     }
     else{
         main = "Infantry";
@@ -200,13 +224,13 @@ function dist(main,p){
 let rest=100-p;
 let side=Math.floor(rest/2);
 
-let d={Infantry:side,Cavalry:side,Marksmen:side};
+let d={Infantry:side,Cavalry:side,Archers:side};
 
 d[main]=p;
 
-let keys=["Infantry","Cavalry","Marksmen"];
+let keys=["Infantry","Cavalry","Archers"];
 
-let rem=100-(d.Infantry+d.Cavalry+d.Marksmen);
+let rem=100-(d.Infantry+d.Cavalry+d.Archers);
 
 for(let k of keys){
  if(k!=main){
@@ -215,8 +239,13 @@ for(let k of keys){
  }
 }
 
-return `${d.Infantry}% ${names[l].Infantry}<br>${d.Cavalry}% ${names[l].Cavalry}<br>${d.Marksmen}% ${names[l].Marksmen}`;
+return `${d.Infantry}% ${names[l].Infantry}<br>${d.Cavalry}% ${names[l].Cavalry}<br>${d.Archers}% ${names[l].Archers}`;
 }
+
+const enemyFocusLabel = twoTypeTie ? t.enemyComposition : t.enemyFocus;
+const enemyFocusText = twoTypeTie
+    ? `${names[l][sorted[0][0]]} (${sorted[0][1]}%) + ${names[l][sorted[1][0]]} (${sorted[1][1]}%)`
+    : `${names[l][enemy]} (${highest}%)`;
 
 if(mode.value==="rally"){
 
@@ -250,7 +279,7 @@ if(tier === "plus1"){
 }
 
 out.innerHTML = `
-<b>${t.enemyFocus}:</b> ${names[l][enemy]} (${highest}%)<br>
+<b>${enemyFocusLabel}:</b> ${enemyFocusText}<br>
 <b>${t.counterLevel}:</b> ${
     stage === "Balanced Counter" ? t.stageBalanced :
     stage === "Light" ? t.stageLight :
@@ -283,16 +312,22 @@ const l = lang.value;
 const t = text[l];
 
 const names = {
-    de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Marksmen:"Schützen"},
-    en:{Infantry:"Infantry",Cavalry:"Cavalry",Marksmen:"Marksmen"},
-    es:{Infantry:"Infantería",Cavalry:"Caballería",Marksmen:"Tiradores"},
-    ko:{Infantry:"보병",Cavalry:"기병",Marksmen:"궁병"}
+    de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Archers:"Bogenschützen"},
+    en:{Infantry:"Infantry",Cavalry:"Cavalry",Archers:"Archers"},
+    es:{Infantry:"Infantería",Cavalry:"Caballería",Archers:"Arqueros"},
+    ko:{Infantry:"보병",Cavalry:"기병",Archers:"궁수"},
+    zh:{Infantry:"步兵",Cavalry:"骑兵",Archers:"弓兵"},
+    fil:{Infantry:"Impanterya",Cavalry:"Kabalyerya",Archers:"Mamamana"},
+    th:{Infantry:"ทหารราบ",Cavalry:"ทหารม้า",Archers:"พลธนู"},
+    tr:{Infantry:"Piyade",Cavalry:"Süvari",Archers:"Okçular"},
+    ru:{Infantry:"Пехота",Cavalry:"Кавалерия",Archers:"Лучники"},
+    vi:{Infantry:"Bộ binh",Cavalry:"Kỵ binh",Archers:"Cung thủ"}
 };
 
 const vals = {
     Infantry:+inf.value,
     Cavalry:+cav.value,
-    Marksmen:+arc.value
+    Archers:+arc.value
 };
 
 const sorted = Object.entries(vals).sort((a,b)=>b[1]-a[1]);
@@ -304,8 +339,8 @@ const gap = highest - second;
 const tie = highest === second;
 
 const counter = {
-    Infantry:"Marksmen",
-    Marksmen:"Cavalry",
+    Infantry:"Archers",
+    Archers:"Cavalry",
     Cavalry:"Infantry"
 };
 
@@ -314,10 +349,10 @@ let main = counter[enemy];
 if(tie){
 
     if(
-        (enemy === "Infantry" && sorted[1][0] === "Marksmen") ||
-        (enemy === "Marksmen" && sorted[1][0] === "Infantry")
+        (enemy === "Infantry" && sorted[1][0] === "Archers") ||
+        (enemy === "Archers" && sorted[1][0] === "Infantry")
     ){
-        main = "Marksmen";
+        main = "Archers";
     }
 
     else if(
@@ -360,12 +395,12 @@ function dist(main,p){
     let d = {
         Infantry:side,
         Cavalry:side,
-        Marksmen:side
+        Archers:side
     };
 
     d[main] = p;
 
-    let rem = 100 - (d.Infantry + d.Cavalry + d.Marksmen);
+    let rem = 100 - (d.Infantry + d.Cavalry + d.Archers);
 
     if(main !== "Infantry"){
         d.Infantry += rem;
@@ -380,14 +415,14 @@ function dist(main,p){
 const d = dist(main, percent);
 
 out.innerHTML = `
-<b>⚔️ All Out Counter</b><br><br>
-<b>${t.enemyFocus}:</b>
-${tie ? "Mixed (" + highest + "% / " + second + "%)" : names[l][enemy] + " (" + highest + "%)"}<br><br>
+<b>${t.allout} — ${t.counter}</b><br><br>
+<b>${tie ? t.enemyComposition : t.enemyFocus}:</b>
+${tie ? names[l][sorted[0][0]] + " (" + highest + "%) + " + names[l][sorted[1][0]] + " (" + second + "%)" : names[l][enemy] + " (" + highest + "%)"}<br><br>
 
 <b>${t.troopDistribution}:</b><br>
 ${d.Infantry}% ${names[l].Infantry}<br>
 ${d.Cavalry}% ${names[l].Cavalry}<br>
-${d.Marksmen}% ${names[l].Marksmen}
+${d.Archers}% ${names[l].Archers}
 `;
 
 copyBtn.style.display = "none";
@@ -405,7 +440,7 @@ const fillerStart = lines.findIndex(line =>
 );
 
 if(fillerStart < 0){
-    alert("No filler troops found.");
+    alert(text[lang.value].noFillers);
     return;
 }
 
@@ -414,7 +449,7 @@ const leaderStart = lines.findIndex(line =>
 );
 
 if(leaderStart < 0){
-    alert("No leader troops found.");
+    alert(text[lang.value].noLeader);
     return;
 }
 

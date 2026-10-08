@@ -36,7 +36,7 @@
         }
         ["inf", "cav", "arc"].forEach((id) => {
             if (Number.isFinite(Number(saved[id]))) {
-                document.getElementById(id).value = saved[id];
+                document.getElementById(id).value = Math.max(0, Math.min(100, Number(saved[id])));
             }
         });
         if (allowed.target.includes(saved.target)) {
@@ -76,6 +76,7 @@
             element.addEventListener("change", savePreferences);
         });
 
+        if (saved) autoFill("inf");
         savePreferences();
         window.dispatchEvent(new Event("preferences-restored"));
     });

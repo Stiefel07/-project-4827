@@ -14,20 +14,37 @@ const out = document.getElementById("out");
 const copyBtn = document.getElementById("copyBtn");
 
 function autoFill(changed){
-    let i = parseInt(inf.value) || 0;
-    let c = parseInt(cav.value) || 0;
-    let a = parseInt(arc.value) || 0;
+    const clampPercent = value => Math.max(0, Math.min(100, parseInt(value, 10) || 0));
+    let i = clampPercent(inf.value);
+    let c = clampPercent(cav.value);
+    let a = clampPercent(arc.value);
+
+    inf.value = i;
+    cav.value = c;
+    arc.value = a;
 
     if(changed==="inf"){
-        if(i + c <= 100) arc.value = 100 - i - c;
+        if(i + c > 100){
+            i = 100 - c;
+            inf.value = i;
+        }
+        arc.value = 100 - i - c;
     }
 
     if(changed==="cav"){
-        if(i + c <= 100) arc.value = 100 - i - c;
+        if(i + c > 100){
+            c = 100 - i;
+            cav.value = c;
+        }
+        arc.value = 100 - i - c;
     }
 
     if(changed==="arc"){
-        if(i + a <= 100) cav.value = 100 - i - a;
+        if(i + a > 100){
+            a = 100 - i;
+            arc.value = a;
+        }
+        cav.value = 100 - i - a;
     }
 }
 

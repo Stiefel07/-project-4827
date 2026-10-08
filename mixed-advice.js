@@ -80,5 +80,6 @@
         element.addEventListener("change", updateMixedAdvice);
     });
 
+    window.addEventListener("preferences-restored", updateMixedAdvice);
     updateMixedAdvice();
 })();

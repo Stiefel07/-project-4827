@@ -83,6 +83,10 @@ border-radius:12px;
 cursor:pointer;
 }
 button:hover{background:#d97706}
+#quickPresets{margin-top:12px}
+#quickPresetButtons{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
+#quickPresetButtons button{flex:1 1 100px;width:auto;margin:0;padding:10px 8px;font-size:14px;background:#334155;border:1px solid rgba(255,255,255,.2)}
+#quickPresetButtons button:hover{background:#475569}
 #secretSupport{
     position:fixed;
     right:14px;
@@ -363,6 +367,17 @@ Kingshot<br>
 <label id="arcLabel">Marksmen (%)</label>
 <input id="arc" type="number" value="40" oninput="autoFill('arc')">
 
+<div id="quickPresets">
+<label id="quickPresetsLabel">Quick sets (Infantry / Cavalry / Marksmen)</label>
+<div id="quickPresetButtons">
+<button type="button" data-troops="50,20,30">50 / 20 / 30</button>
+<button type="button" data-troops="60,40,0">60 / 40 / 0</button>
+<button type="button" data-troops="50,0,50">50 / 0 / 50</button>
+<button type="button" data-troops="0,50,50">0 / 50 / 50</button>
+<button type="button" data-troops="50,50,0">50 / 50 / 0</button>
+</div>
+</div>
+
 <label id="modeLabel">Mode</label>
 <select id="mode"></select>
 <label id="tierLabel">Enemy Tier</label>
@@ -446,6 +461,7 @@ donateText:"Wenn dir dieses Tool geholfen hat, kannst du die Weiterentwicklung m
 donateBtn:"💛 Spenden",
 laterBtn:"✖ Jetzt nicht",
 installTitle:"📲 Battle Counter installieren",
+quickPresets:"Schnellauswahl (Infanterie / Kavallerie / Schützen)",
 installStep1:"1️⃣ Tippe auf den Share-Button ⬆️",
 installStep2:"2️⃣ Wähle 'Zum Home-Bildschirm'",
 installStep3:"3️⃣ Tippe auf 'Hinzufügen'",
@@ -505,6 +521,7 @@ donateText:"If this tool has been helpful to you, you can support future updates
 donateBtn:"💛 Donate",
 laterBtn:"✖ Not now",
 installTitle:"📲 Install Battle Counter",
+quickPresets:"Quick sets (Infantry / Cavalry / Marksmen)",
 installStep1:"1️⃣ Tap the Share button ⬆️",
 installStep2:"2️⃣ Choose 'Add to Home Screen'",
 installStep3:"3️⃣ Tap 'Add'",
@@ -564,6 +581,7 @@ donateText:"Si esta herramienta te ha sido útil, puedes apoyar futuras actualiz
 donateBtn:"💛 Donar",
 laterBtn:"✖ Ahora no",
 installTitle:"📲 Instalar Battle Counter",
+quickPresets:"Selección rápida (Infantería / Caballería / Tiradores)",
 installStep1:"1️⃣ Pulsa el botón Share ⬆️",
 installStep2:"2️⃣ Selecciona 'Añadir a pantalla de inicio'",
 installStep3:"3️⃣ Pulsa 'Añadir'",
@@ -623,6 +641,7 @@ donateText:"이 도구가 도움이 되었다면 자발적인 후원으로 프�
 donateBtn:"후원",
 laterBtn:"나중에",
 installTitle:"📲 Battle Counter 설치",
+quickPresets:"빠른 선택 (보병 / 기병 / 궁병)",
 installStep1:"1️⃣ 공유 버튼 ⬆️ 을 누르세요",
 installStep2:"2️⃣ '홈 화면에 추가'를 선택하세요",
 installStep3:"3️⃣ '추가'를 누르세요",
@@ -662,6 +681,7 @@ infoBox.innerText = t.info;
 helpBtn.innerText = "ⓘ " + t.help;
 helpContent.innerHTML = t.helpPopup;
 document.getElementById("installTitle").innerHTML = t.installTitle;
+document.getElementById("quickPresetsLabel").innerText = t.quickPresets;
 
 document.getElementById("installText").innerHTML =
         "<b>iPhone / iPad</b><br><br>" +
@@ -865,5 +885,6 @@ function closeInstallPopup() {
 </script>
 <script src="counter.js"></script>
 <script src="mixed-advice.js"></script>
+<script src="preferences.js"></script>
 </body>
 </html>

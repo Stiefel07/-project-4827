@@ -251,7 +251,12 @@ if(tier === "plus1"){
 
 out.innerHTML = `
 <b>${t.enemyFocus}:</b> ${names[l][enemy]} (${highest}%)<br>
-<b>${t.counterLevel}:</b> ${stage}<br>
+<b>${t.counterLevel}:</b> ${
+    stage === "Balanced Counter" ? t.stageBalanced :
+    stage === "Light" ? t.stageLight :
+    stage === "Medium" ? t.stageMedium :
+    t.stageHeavy
+}<br>
 <b>${t.enemyWeakness}:</b> ${advantage}
 📤 <b>${t.dist}:</b><br>${leader}<br><br>
 👥 <b>${t.fill}:</b><br>${fillers}

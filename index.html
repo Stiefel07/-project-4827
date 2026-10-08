@@ -425,7 +425,8 @@ Fillers only
 </div>
 
 <script>
-const BUILD_ID = "KSCT_2026_1.3.0_STIEFEL";
+const APP_VERSION = "1.4.0";
+const BUILD_ID = `KSCT_2026_${APP_VERSION}_STIEFEL`;
 const BUILD_HASH = "B12X-KS-20";
 const text={
 de:{
@@ -941,7 +942,7 @@ margin-bottom:20px;
 line-height:1.5;">
 Unofficial fan-made tool for Kingshot.<br>
 Kingshot is a trademark of its respective owner.
-<br><span style="font-size:11px;color:#9ca3af;">Version 1.3.0</span>
+<br><span id="appVersion" style="font-size:11px;color:#9ca3af;"></span>
 </div>
 <!-- Install Popup -->
 
@@ -991,6 +992,9 @@ Thank you very much! ❤️
 </div>
 </div>
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("appVersion").textContent = `Version ${APP_VERSION}`;
+});
 document.getElementById("secretSupport").onclick = function () {
     document.getElementById("supportPopup").style.display = "flex";
 };

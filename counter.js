@@ -57,6 +57,7 @@ const enemy=sorted[0][0];
 const highest=sorted[0][1];
 const second = sorted[1][1];
 const gap = highest - second;
+const twoTypeTie = highest === second && sorted[2][1] === 0;
 
 const counter={
 "Infantry":"Marksmen",
@@ -218,6 +219,11 @@ for(let k of keys){
 return `${d.Infantry}% ${names[l].Infantry}<br>${d.Cavalry}% ${names[l].Cavalry}<br>${d.Marksmen}% ${names[l].Marksmen}`;
 }
 
+const enemyFocusLabel = twoTypeTie ? t.enemyComposition : t.enemyFocus;
+const enemyFocusText = twoTypeTie
+    ? `${names[l][sorted[0][0]]} (${sorted[0][1]}%) + ${names[l][sorted[1][0]]} (${sorted[1][1]}%)`
+    : `${names[l][enemy]} (${highest}%)`;
+
 if(mode.value==="rally"){
 
 let leader=dist(main,leaderPercent);
@@ -250,7 +256,7 @@ if(tier === "plus1"){
 }
 
 out.innerHTML = `
-<b>${t.enemyFocus}:</b> ${names[l][enemy]} (${highest}%)<br>
+<b>${enemyFocusLabel}:</b> ${enemyFocusText}<br>
 <b>${t.counterLevel}:</b> ${
     stage === "Balanced Counter" ? t.stageBalanced :
     stage === "Light" ? t.stageLight :

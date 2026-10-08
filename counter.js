@@ -424,7 +424,7 @@ const copyText = copyMode === "fillers"
 
 navigator.clipboard.writeText(copyText).then(() => {
 
-    copyBtn.innerText = "Copied!";
+    copyBtn.innerText = text[lang.value].copied;
 
     setTimeout(() => {
         copyBtn.innerText = text[lang.value].copy;

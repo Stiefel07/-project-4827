@@ -3,7 +3,7 @@
     const storageKey = "kingshot-counter.preferences.v1";
     const ids = ["lang", "inf", "cav", "arc", "mode", "target", "enemyTier"];
     const allowed = {
-        lang: ["de", "en", "es", "ko"],
+        lang: ["de", "en", "es", "ko", "zh", "fil", "th", "tr", "ru", "vi"],
         mode: ["rally", "solo"],
         target: ["castle", "outpost", "shrine", "allout"],
         enemyTier: ["same", "plus1"]

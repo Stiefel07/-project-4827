@@ -52,7 +52,7 @@ function calc(){
 let i=+inf.value,c=+cav.value,a=+arc.value;
 
 if(i+c+a!==100){
-    out.innerHTML="<b>100% required.</b>";
+    out.innerHTML="<b>"+text[lang.value].percentRequired+"</b>";
     return;
 }
 
@@ -86,7 +86,13 @@ const names={
 de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Archers:"Bogenschützen"},
 en:{Infantry:"Infantry",Cavalry:"Cavalry",Archers:"Archers"},
 es:{Infantry:"Infantería",Cavalry:"Caballería",Archers:"Arqueros"},
-ko:{Infantry:"보병",Cavalry:"기병",Archers:"궁수"}
+ko:{Infantry:"보병",Cavalry:"기병",Archers:"궁수"},
+zh:{Infantry:"步兵",Cavalry:"骑兵",Archers:"弓兵"},
+fil:{Infantry:"Impanterya",Cavalry:"Kabalyerya",Archers:"Mamamana"},
+th:{Infantry:"ทหารราบ",Cavalry:"ทหารม้า",Archers:"พลธนู"},
+tr:{Infantry:"Piyade",Cavalry:"Süvari",Archers:"Okçular"},
+ru:{Infantry:"Пехота",Cavalry:"Кавалерия",Archers:"Лучники"},
+vi:{Infantry:"Bộ binh",Cavalry:"Kỵ binh",Archers:"Cung thủ"}
 };
 
 let l=lang.value,t=text[l];
@@ -309,7 +315,13 @@ const names = {
     de:{Infantry:"Infanterie",Cavalry:"Kavallerie",Archers:"Bogenschützen"},
     en:{Infantry:"Infantry",Cavalry:"Cavalry",Archers:"Archers"},
     es:{Infantry:"Infantería",Cavalry:"Caballería",Archers:"Arqueros"},
-    ko:{Infantry:"보병",Cavalry:"기병",Archers:"궁수"}
+    ko:{Infantry:"보병",Cavalry:"기병",Archers:"궁수"},
+    zh:{Infantry:"步兵",Cavalry:"骑兵",Archers:"弓兵"},
+    fil:{Infantry:"Impanterya",Cavalry:"Kabalyerya",Archers:"Mamamana"},
+    th:{Infantry:"ทหารราบ",Cavalry:"ทหารม้า",Archers:"พลธนู"},
+    tr:{Infantry:"Piyade",Cavalry:"Süvari",Archers:"Okçular"},
+    ru:{Infantry:"Пехота",Cavalry:"Кавалерия",Archers:"Лучники"},
+    vi:{Infantry:"Bộ binh",Cavalry:"Kỵ binh",Archers:"Cung thủ"}
 };
 
 const vals = {
@@ -403,9 +415,9 @@ function dist(main,p){
 const d = dist(main, percent);
 
 out.innerHTML = `
-<b>⚔️ All Out Counter</b><br><br>
-<b>${t.enemyFocus}:</b>
-${tie ? "Mixed (" + highest + "% / " + second + "%)" : names[l][enemy] + " (" + highest + "%)"}<br><br>
+<b>${t.allout} — ${t.counter}</b><br><br>
+<b>${tie ? t.enemyComposition : t.enemyFocus}:</b>
+${tie ? names[l][sorted[0][0]] + " (" + highest + "%) + " + names[l][sorted[1][0]] + " (" + second + "%)" : names[l][enemy] + " (" + highest + "%)"}<br><br>
 
 <b>${t.troopDistribution}:</b><br>
 ${d.Infantry}% ${names[l].Infantry}<br>
@@ -428,7 +440,7 @@ const fillerStart = lines.findIndex(line =>
 );
 
 if(fillerStart < 0){
-    alert("No filler troops found.");
+    alert(text[lang.value].noFillers);
     return;
 }
 
@@ -437,7 +449,7 @@ const leaderStart = lines.findIndex(line =>
 );
 
 if(leaderStart < 0){
-    alert("No leader troops found.");
+    alert(text[lang.value].noLeader);
     return;
 }
 
